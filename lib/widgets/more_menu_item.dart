@@ -22,35 +22,30 @@ class MoreMenuItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.only(
-          left: 17.268,
-          top: 17.268,
-          right: 1.275,
-          bottom: 1.275,
-        ),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: const Color(0x1A000000),
-            width: 1.275,
+            width: 1,
           ),
         ),
         child: Row(
           children: [
             // Icon Container
             Container(
-              width: 47.979,
-              height: 47.979,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
                 color: iconBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: icon,
               ),
             ),
-            const SizedBox(width: 15.993),
+            const SizedBox(width: 12),
 
             // Text Content
             Expanded(
@@ -62,12 +57,12 @@ class MoreMenuItem extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w500,
                       color: AppConfig.textPrimary,
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 1.992),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: const TextStyle(
@@ -82,15 +77,11 @@ class MoreMenuItem extends StatelessWidget {
             ),
 
             // Arrow Icon
-            const SizedBox(width: 15.993),
-            SizedBox(
-              width: 19.996,
-              height: 19.996,
-              child: Icon(
-                Icons.chevron_right,
-                size: 19.996,
-                color: const Color(0xFF99A1AF),
-              ),
+            const SizedBox(width: 12),
+            const Icon(
+              Icons.chevron_right,
+              size: 20,
+              color: Color(0xFF99A1AF),
             ),
           ],
         ),

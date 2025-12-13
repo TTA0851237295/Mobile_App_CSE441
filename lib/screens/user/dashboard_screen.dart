@@ -1,27 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobileapp_taman/widgets/layout/app_shell.dart';
-import 'package:fl_chart/fl_chart.dart'; // 👈 THÊM DÒNG NÀY
-
-void main() {
-  runApp(const TamAnApp());
-}
-
-class TamAnApp extends StatelessWidget {
-  const TamAnApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Tâm An',
-      theme: ThemeData(
-        fontFamily: 'Arial',
-        scaffoldBackgroundColor: const Color(0xFF0F172A), // nền ngoài tối
-      ),
-      home: const StatisticsScreen(),
-    );
-  }
-}
+import 'package:fl_chart/fl_chart.dart';
 
 /// Màn hình chính – tab "Thống kê"
 class StatisticsScreen extends StatelessWidget {
@@ -127,7 +105,7 @@ class _FilterChip extends StatelessWidget {
         color: bg,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: selected ? Colors.transparent : Colors.black.withOpacity(0.08),
+          color: selected ? Colors.transparent : Colors.black.withValues(alpha: 0.08),
           width: 1.25,
         ),
       ),

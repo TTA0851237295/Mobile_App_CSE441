@@ -3,6 +3,8 @@ import '../../config/app_config.dart';
 import '../../models/check_in.dart';
 import '../../widgets/tag_chip.dart';
 import '../../widgets/stat_card.dart';
+import '../../widgets/custom_app_bar.dart';
+import '../../widgets/custom_bottom_nav.dart';
 import '../../utils/helpers.dart';
 
 class JournalScreen extends StatefulWidget {
@@ -64,26 +66,35 @@ class _JournalScreenState extends State<JournalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppConfig.backgroundColor,
+      appBar: const CustomAppBar(),
       body: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           children: [
-
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _buildTitle(),
-                  const SizedBox(height: 24),
-                  _buildDateFilter(),
-                  const SizedBox(height: 24),
-                  _buildStatCard(),
-                  const SizedBox(height: 16),
-                  _buildCheckInList(),
-                ],
-              ),
-            ),
+            _buildTitle(),
+            const SizedBox(height: 16),
+            _buildDateFilter(),
+            const SizedBox(height: 16),
+            _buildStatCard(),
+            const SizedBox(height: 16),
+            _buildCheckInList(),
           ],
         ),
+      ),
+      bottomNavigationBar: CustomBottomNav(
+        currentIndex: 3, // Index cho Khác/More (vì Journal được truy cập từ đây)
+        onItemSelected: (index) {
+          // TODO: Navigate based on index
+          if (index == 0) {
+            Navigator.pushReplacementNamed(context, '/home');
+          } else if (index == 1) {
+            Navigator.pushReplacementNamed(context, '/dashboard');
+          } else if (index == 2) {
+            Navigator.pushReplacementNamed(context, '/insights');
+          } else if (index == 3) {
+            Navigator.pop(context); // Quay lại màn hình More
+          }
+        },
       ),
     );
   }
@@ -97,20 +108,19 @@ class _JournalScreenState extends State<JournalScreen> {
           onTap: () => Navigator.pop(context),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: [
+            children: const [
               Icon(
                 Icons.arrow_back_ios,
                 size: 20,
                 color: AppConfig.primaryColor,
               ),
-              const SizedBox(width: 8),
-              const Text(
+              SizedBox(width: 8),
+              Text(
                 'Quay lại',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: AppConfig.primaryColor,
-                  height: 1.5,
                 ),
               ),
             ],
@@ -121,19 +131,17 @@ class _JournalScreenState extends State<JournalScreen> {
           'Nhật ký Cảm xúc',
           style: TextStyle(
             fontSize: 20,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w600,
             color: AppConfig.textPrimary,
-            height: 1.5,
           ),
         ),
         const SizedBox(height: 4),
         const Text(
           'Xem lại lịch sử cảm xúc của bạn',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w400,
             color: AppConfig.textSecondary,
-            height: 1.5,
           ),
         ),
       ],
@@ -159,6 +167,9 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   Widget _buildDateChip(String date, bool isSelected) {
+    final bg = isSelected ? const Color(0xFF020617) : Colors.white;
+    final fg = isSelected ? Colors.white : const Color(0xFF0F172A);
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -166,23 +177,21 @@ class _JournalScreenState extends State<JournalScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppConfig.textPrimary : Colors.white,
+          color: bg,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? Colors.transparent : AppConfig.borderColor,
-            width: 1.275,
+            color: isSelected ? Colors.transparent : Colors.black.withValues(alpha: 0.08),
+            width: 1.25,
           ),
         ),
         child: Center(
           child: Text(
             date,
             style: TextStyle(
+              color: fg,
               fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: isSelected ? Colors.white : AppConfig.textPrimary,
-              height: 1.43,
             ),
           ),
         ),
