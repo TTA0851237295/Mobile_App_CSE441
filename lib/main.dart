@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart'; // TODO: Uncomment when using MultiProvider
 import 'screens/user/journal_screen.dart';
 import 'screens/user/more_screen.dart';
+import 'package:mobileapp_taman/screens/user/insights.dart';
+import 'package:mobileapp_taman/screens/user/dashboard_screen.dart';
+import 'package:mobileapp_taman/widgets/layout/app_shell.dart';
+
 
 void main() {
   runApp(const TamAnApp());
@@ -23,6 +27,9 @@ class TamAnApp extends StatelessWidget {
         '/journal': (context) => const JournalScreen(),
         '/more': (context) => const MoreScreen(),
       },
+      home: const AppShell(),
+        
+    
     );
   }
 }
