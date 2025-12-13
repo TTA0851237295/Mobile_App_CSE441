@@ -27,7 +27,6 @@ class TamAnApp extends StatelessWidget {
         '/journal': (context) => const JournalScreen(),
         '/more': (context) => const MoreScreen(),
       },
-
         
     
     );
