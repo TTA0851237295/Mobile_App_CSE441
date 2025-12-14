@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'screens/user/journal_screen.dart';
 import 'screens/user/more_screen.dart';
 import '/widgets/app_shell.dart';
+import 'package:mobileapp_taman/screens/auth/auths_screen.dart';
 
 
 void main() {
@@ -18,15 +19,8 @@ class TamAnApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // ❗ Đây là màn sẽ chạy đầu tiên trong app
+           home: const AuthScreen(),
 
-      home: const AppShell(),
-      // Routes configuration
-      routes: {
-        '/journal': (context) => const JournalScreen(),
-        '/more': (context) => const MoreScreen(),
-      },
-
-        
     
     );
   }
