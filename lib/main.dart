@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobileapp_taman/screens/user/insights.dart';
-import 'package:mobileapp_taman/screens/user/dashboard_screen.dart';
-import 'package:mobileapp_taman/widgets/layout/app_shell.dart';
+import 'package:mobileapp_taman/screens/auth/auths_screen.dart';
 
 
 void main() {
@@ -17,8 +15,8 @@ class TamAnApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // ❗ Đây là màn sẽ chạy đầu tiên trong app
-      home: const AppShell(),
-        
+           home: const AuthScreen(),
+
     
     );
   }
