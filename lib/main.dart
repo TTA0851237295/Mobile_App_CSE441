@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart'; // TODO: Uncomment when using MultiProvider
+import 'screens/user/journal_screen.dart';
+import 'screens/user/more_screen.dart';
+import '/widgets/app_shell.dart';
 import 'package:mobileapp_taman/screens/auth/auths_screen.dart';
 
 

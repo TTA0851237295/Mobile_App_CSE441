@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_btl/screens/user/journal_screen.dart';
 import 'custom_app_bar.dart';
 import 'custom_bottom_nav.dart';
 import '/screens/user/insight.dart';
