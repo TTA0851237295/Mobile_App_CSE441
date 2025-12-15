@@ -29,7 +29,7 @@ class CustomBottomNav extends StatelessWidget {
           _navItem(index: 0, label: "Check-in", icon: Icons.home_outlined),
           _navItem(index: 1, label: "Thống kê", icon: Icons.bar_chart),
           _navItem(index: 2, label: "Phân tích", icon: Icons.lightbulb_outline),
-          _navItem(index: 3, label: "Khác", icon: Icons.settings),
+          _navItem(index: 3, label: "Khác", icon: Icons.settings_outlined),
         ],
       ),
     );
