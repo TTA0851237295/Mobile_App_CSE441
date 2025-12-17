@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'admin_setting_screen.dart';
 
 class AdminSettingsBody extends StatelessWidget {
-  const AdminSettingsBody({super.key});
+  final VoidCallback onOpenSettings;   // mở trang setting chi tiết
+
+  const AdminSettingsBody({
+    super.key,
+    required this.onOpenSettings,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -9,21 +15,31 @@ class AdminSettingsBody extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          _Header(),
-          SizedBox(height: 16),
+        children: [
+          const _Header(),
+          const SizedBox(height: 16),
+
+          // ⭐ CARD ĐĂNG XUẤT
           _ProfileCard(),
-          SizedBox(height: 16),
-          _SettingsCard(),
-          SizedBox(height: 24),
-          _FooterVersion(),
+
+          const SizedBox(height: 16),
+
+          // ⭐ CARD CÀI ĐẶT – mở Setting chi tiết
+          _SettingsCard(onTap: onOpenSettings),
+
+          const SizedBox(height: 24),
+
+          const _FooterVersion(),
         ],
       ),
     );
   }
 }
 
-/// ================= HEADER =================
+//
+// ───────────────────────────────────────── HEADER ─────────────────────────────────────────
+//
+
 class _Header extends StatelessWidget {
   const _Header();
 
@@ -53,139 +69,179 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// ================= PROFILE CARD =================
+//
+// ──────────────────────────────── CARD ĐĂNG XUẤT ────────────────────────────────
+//
+
 class _ProfileCard extends StatelessWidget {
   const _ProfileCard();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF2E7FE),
-              borderRadius: BorderRadius.circular(24),
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () {
+        _showLogoutDialog(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.black12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2E7FE),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Icon(Icons.person, color: Color(0xFF8B5CF6)),
             ),
-            child: const Icon(
-              Icons.person,
-              color: Color(0xFF8B5CF6),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('admin',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                  SizedBox(height: 2),
+                  Text('Quản trị viên',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF495565))),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'admin',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Quản trị viên',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF495565),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.chevron_right,
-            color: Color(0xFF9CA3AF),
-          ),
-        ],
+            const Icon(Icons.logout, color: Color(0xFF9CA3AF)),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// ================= SETTINGS CARD =================
+//
+// ────────────────────────────────────── LOGOUT DIALOG ─────────────────────────────────────
+//
+
+void _showLogoutDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (_) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Xác nhận đăng xuất",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Bạn có chắc muốn đăng xuất? Dữ liệu của bạn vẫn được lưu trữ an toàn trên thiết bị.",
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+            const SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Hủy"),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // TODO: hành động đăng xuất thực sự
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white),
+                  child: const Text("Đăng xuất"),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+//
+// ─────────────────────────────── CARD CÀI ĐẶT ───────────────────────────────
+//
+
 class _SettingsCard extends StatelessWidget {
-  const _SettingsCard();
+  final VoidCallback onTap;
+  const _SettingsCard({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF2E7FE),
-              borderRadius: BorderRadius.circular(10),
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,   // ⭐ chuyển sang tab Setting chi tiết
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.black12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2E7FE),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.settings, color: Color(0xFF8B5CF6)),
             ),
-            child: const Icon(
-              Icons.settings,
-              color: Color(0xFF8B5CF6),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Cài đặt',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                  SizedBox(height: 2),
+                  Text('Tùy chỉnh tài khoản admin',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF495565))),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Cài đặt',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Tùy chỉnh tài khoản admin',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF495565),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.chevron_right,
-            color: Color(0xFF9CA3AF),
-          ),
-        ],
+            const Icon(Icons.chevron_right, color: Color(0xFF9CA3AF)),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// ================= FOOTER =================
+//
+// ───────────────────────────────────── FOOTER ─────────────────────────────────────
+//
+
 class _FooterVersion extends StatelessWidget {
   const _FooterVersion();
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text(
         'Tâm An v1.0.0',
-        style: TextStyle(
-          fontSize: 14,
-          color: Color(0xFF697282),
-        ),
+        style: TextStyle(fontSize: 14, color: Color(0xFF697282)),
       ),
     );
   }
