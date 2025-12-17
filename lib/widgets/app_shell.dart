@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'custom_app_bar.dart';
 import 'custom_bottom_nav.dart';
-import '/screens/user/insight.dart';
-import '/screens/user/dashboard_screen.dart';
-import '/screens/user/more_screen.dart';
+import '../screens/user/insight.dart';
+import '../screens/user/dashboard_screen.dart';
+import '../screens/user/more_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});

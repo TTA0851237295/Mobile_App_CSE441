@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobileapp_taman/widgets/layout/app_shell.dart';
+import '../../widgets/app_shell.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -248,7 +248,7 @@ class _LoginForm extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
+              color: const Color.fromRGBO(255, 255, 255, 0.9),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFE9D8FD)),
             ),
@@ -340,7 +340,7 @@ class _RegisterForm extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
+                color: const Color.fromRGBO(255, 255, 255, 0.9),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: const Color(0xFFE9D8FD)),
               ),
