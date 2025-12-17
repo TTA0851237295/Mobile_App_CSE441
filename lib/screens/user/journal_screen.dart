@@ -23,14 +23,32 @@ class _JournalScreenState extends State<JournalScreen> {
     CheckIn(
       id: '1',
       userId: 'user1',
-      emotion: 'Giận dữ',
-      timestamp: DateTime(2025, 12, 6, 23, 30),
+      emotion: 'Lo lắng',
+      timestamp: DateTime(2025, 12, 14, 9, 29),
+      location: '🏠 Ở nhà',
+      activity: '⚡ Lướt mạng',
+      people: '😴 Một mình',
+      note: 'Lo lắng cho tuần mới, nhiều deadline',
     ),
     CheckIn(
       id: '2',
       userId: 'user1',
       emotion: 'Căng thẳng',
-      timestamp: DateTime(2025, 12, 6, 23, 24),
+      timestamp: DateTime(2025, 12, 14, 6, 29),
+      location: '🏠 Ở nhà',
+      activity: '✨ Khác',
+      people: '😴 Một mình',
+      note: 'Suy nghĩ về công việc tuần tới',
+    ),
+    CheckIn(
+      id: '3',
+      userId: 'user1',
+      emotion: 'Hạnh phúc',
+      timestamp: DateTime(2025, 12, 13, 7, 29),
+      location: '🌳 Ngoài trời',
+      activity: '🏃 Tập thể dục',
+      people: '👫 Bạn bè',
+      note: 'Chạy bộ với bạn bè, vui về',
     ),
   ];
 
@@ -150,7 +168,7 @@ class _JournalScreenState extends State<JournalScreen> {
 
   Widget _buildDateFilter() {
     return SizedBox(
-      height: 64,
+      height: 40,
       child: ListView.separated(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
@@ -237,88 +255,186 @@ class _JournalScreenState extends State<JournalScreen> {
   Widget _buildCheckInCard(CheckIn checkIn) {
     final emotionStyle = CheckIn.getEmotionStyle(checkIn.emotion);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(21.271),
-        child: Row(
-          children: [
-            // Emotion Icon Container
-            Container(
-              width: 50.529,
-              height: 50.529,
-              decoration: BoxDecoration(
-                color: emotionStyle.backgroundColor,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: emotionStyle.borderColor,
-                  width: 1.275,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0x1A000000),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row
+          Row(
+            children: [
+              // Emotion Icon Container
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: emotionStyle.backgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: emotionStyle.borderColor,
+                    width: 1.25,
+                  ),
+                ),
+                child: Icon(
+                  _getEmotionIcon(checkIn.emotion),
+                  size: 24,
+                  color: emotionStyle.color,
                 ),
               ),
-              child: Icon(
-                _getEmotionIcon(checkIn.emotion),
-                size: 24,
-                color: emotionStyle.color,
-              ),
-            ),
-            const SizedBox(width: 12),
+              const SizedBox(width: 12),
 
-            // Emotion Info
-            Expanded(
-              child: Column(
+              // Emotion Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TagChip(
+                      label: emotionStyle.label,
+                      color: emotionStyle.color,
+                      backgroundColor: emotionStyle.backgroundColor,
+                      borderColor: emotionStyle.borderColor,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      Helpers.formatDateTime(checkIn.timestamp),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: AppConfig.textSecondary,
+                        height: 1.43,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Delete Button
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: IconButton(
+                  onPressed: () => _showDeleteDialog(checkIn),
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    size: 20,
+                    color: Color(0xFFE7000B),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Context Info (location, activity, people)
+          if (checkIn.location != null || checkIn.activity != null || checkIn.people != null) ...[
+            const SizedBox(height: 12),
+            if (checkIn.location != null)
+              _buildContextRow(Icons.location_on_outlined, checkIn.location!),
+            if (checkIn.activity != null)
+              _buildContextRow(Icons.local_activity_outlined, checkIn.activity!),
+            if (checkIn.people != null)
+              _buildContextRow(Icons.people_outline, checkIn.people!),
+          ],
+
+          // Note
+          if (checkIn.note != null && checkIn.note!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF9FAFB),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TagChip(
-                    label: emotionStyle.label,
-                    color: emotionStyle.color,
-                    backgroundColor: emotionStyle.backgroundColor,
-                    borderColor: emotionStyle.borderColor,
+                  const Text(
+                    '💭',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    Helpers.formatDateTime(checkIn.timestamp),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppConfig.textSecondary,
-                      height: 1.43,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      checkIn.note!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: AppConfig.textPrimary,
+                        height: 1.43,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
+          ],
+        ],
+      ),
+    );
+  }
 
-            // Delete Button
-            IconButton(
-              onPressed: () => _showDeleteDialog(checkIn),
-              icon: const Icon(
-                Icons.delete_outline,
-                size: 16,
-                color: Color(0xFFE7000B),
+  Widget _buildContextRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: AppConfig.textSecondary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: AppConfig.textPrimary,
+                height: 1.43,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   IconData _getEmotionIcon(String emotion) {
     switch (emotion.toLowerCase()) {
+      case 'lo lắng':
+      case 'anxious':
+      case 'worried':
+        return Icons.mood_bad; // Mặt buồn/lo lắng
       case 'giận dữ':
       case 'angry':
-        return Icons.sentiment_very_dissatisfied;
+        return Icons.sentiment_very_dissatisfied; // Mặt rất tức giận
       case 'căng thẳng':
       case 'stressed':
-        return Icons.bolt;
+        return Icons.bolt; // Tia chớp
       case 'vui vẻ':
       case 'happy':
-        return Icons.sentiment_very_satisfied;
+      case 'hạnh phúc':
+        return Icons.mood; // Mặt cười rộng (mood icon)
       case 'bình thường':
       case 'neutral':
-        return Icons.sentiment_neutral;
+        return Icons.sentiment_neutral; // Mặt bình thường
       case 'buồn':
       case 'sad':
-        return Icons.sentiment_dissatisfied;
+        return Icons.sentiment_dissatisfied; // Mặt buồn
       default:
         return Icons.circle;
     }

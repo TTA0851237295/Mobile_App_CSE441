@@ -7,6 +7,9 @@ class CheckIn {
   final DateTime timestamp;
   final String? note;
   final List<String>? tags;
+  final String? location;
+  final String? activity;
+  final String? people;
 
   CheckIn({
     required this.id,
@@ -15,6 +18,9 @@ class CheckIn {
     required this.timestamp,
     this.note,
     this.tags,
+    this.location,
+    this.activity,
+    this.people,
   });
 
   factory CheckIn.fromJson(Map<String, dynamic> json) {
@@ -25,6 +31,9 @@ class CheckIn {
       timestamp: DateTime.parse(json['timestamp']),
       note: json['note'],
       tags: json['tags'] != null ? List<String>.from(json['tags']) : null,
+      location: json['location'],
+      activity: json['activity'],
+      people: json['people'],
     );
   }
 
@@ -36,12 +45,24 @@ class CheckIn {
       'timestamp': timestamp.toIso8601String(),
       'note': note,
       'tags': tags,
+      'location': location,
+      'activity': activity,
+      'people': people,
     };
   }
 
   // Helper để lấy màu theo cảm xúc
   static EmotionStyle getEmotionStyle(String emotion) {
     switch (emotion.toLowerCase()) {
+      case 'lo lắng':
+      case 'anxious':
+      case 'worried':
+        return EmotionStyle(
+          label: 'Lo lắng',
+          color: const Color(0xFF9333EA),
+          backgroundColor: const Color(0xFFFAF5FF),
+          borderColor: const Color(0xFFE9D5FF),
+        );
       case 'giận dữ':
       case 'angry':
         return EmotionStyle(
@@ -60,8 +81,9 @@ class CheckIn {
         );
       case 'vui vẻ':
       case 'happy':
+      case 'hạnh phúc':
         return EmotionStyle(
-          label: 'Vui vẻ',
+          label: 'Hạnh phúc',
           color: const Color(0xFF10B981),
           backgroundColor: const Color(0xFFF0FDF4),
           borderColor: const Color(0xFFBBF7D0),

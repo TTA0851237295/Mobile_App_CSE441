@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobileapp_taman/screens/auth/auths_screen.dart';
+// import 'package:provider/provider.dart'; // TODO: Uncomment when using MultiProvider
+import 'screens/auth/auths_screen.dart';
 
 
 void main() {
