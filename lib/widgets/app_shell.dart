@@ -17,10 +17,10 @@ class _AppShellState extends State<AppShell> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = const [
-    StressReliefScreen(),
-    StatisticsScreen(),
-    InsightsScreen(),
-    MoreScreen(),
+    StressReliefScreen(),   // Index 0 - Trang Check-in (chọn cảm xúc)
+    StatisticsScreen(),     // Index 1 - Thống kê
+    InsightsScreen(),       // Index 2 - Insights/Phân tích
+    MoreScreen(),           // Index 3 - Khác (More)
   ];
 
   @override
