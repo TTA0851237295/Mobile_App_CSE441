@@ -4,6 +4,7 @@ import 'screens/auth/auths_screen.dart';
 import 'screens/user/journal_screen.dart';
 import 'screens/user/more_screen.dart';
 import 'screens/user/settings_screen.dart';
+import 'screens/user/goals_screen.dart';
 
 
 void main() {
@@ -26,6 +27,7 @@ class TamAnApp extends StatelessWidget {
              '/journal': (context) => const JournalScreen(),
              '/more': (context) => const MoreScreen(),
              '/settings': (context) => const SettingsScreen(),
+             '/goals': (context) => const GoalsScreen(),
            },
 
 

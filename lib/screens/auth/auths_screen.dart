@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobileapp_taman/widgets/layout/app_shell.dart';
-import 'package:mobileapp_taman/widgets/layout/app_shell_admin.dart';
 import '../../widgets/app_shell.dart';
+import '../../widgets/app_shell_admin.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
