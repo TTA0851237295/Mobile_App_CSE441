@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'app_bar_admin.dart';
 import 'bottom_nav_admin.dart';
-import 'package:mobileapp_taman/screens/admin/admin_dashboard.dart';
-import 'package:mobileapp_taman/screens/admin/admin_settings.dart';
+import '../screens/admin/admin_home.dart';
+import '../screens/admin/admin_settings.dart';
+
 
 // nếu chưa có, có thể để tạm Container()
 

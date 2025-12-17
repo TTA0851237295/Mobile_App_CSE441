@@ -3,7 +3,16 @@ import '../../config/app_config.dart';
 import '../../widgets/more_menu_item.dart';
 
 class MoreScreen extends StatefulWidget {
-  const MoreScreen({Key? key}) : super(key: key);
+  final VoidCallback? onNavigateToJournal;
+  final VoidCallback? onNavigateToGoals;
+  final VoidCallback? onNavigateToSettings;
+
+  const MoreScreen({
+    Key? key,
+    this.onNavigateToJournal,
+    this.onNavigateToGoals,
+    this.onNavigateToSettings,
+  }) : super(key: key);
 
   @override
   State<MoreScreen> createState() => _MoreScreenState();
@@ -167,7 +176,7 @@ class _MoreScreenState extends State<MoreScreen> {
           title: 'Mục tiêu',
           subtitle: 'Đặt và theo dõi mục tiêu sức khỏe',
           onTap: () {
-            // TODO: Navigate to Goals screen
+            widget.onNavigateToGoals?.call();
           },
         ),
         const SizedBox(height: 12),
@@ -177,7 +186,7 @@ class _MoreScreenState extends State<MoreScreen> {
           title: 'Nhật ký',
           subtitle: 'Ghi chú chi tiết cảm xúc',
           onTap: () {
-            Navigator.pushNamed(context, '/journal');
+            widget.onNavigateToJournal?.call();
           },
         ),
         const SizedBox(height: 12),
@@ -187,7 +196,7 @@ class _MoreScreenState extends State<MoreScreen> {
           title: 'Cài đặt',
           subtitle: 'Quản lý tài khoản và ứng dụng',
           onTap: () {
-            Navigator.pushNamed(context, '/settings');
+            widget.onNavigateToSettings?.call();
           },
         ),
       ],

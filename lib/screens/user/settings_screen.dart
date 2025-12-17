@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../config/app_config.dart';
-import '../../widgets/custom_app_bar.dart';
-import '../../widgets/custom_bottom_nav.dart';
 import '../../widgets/settings_components.dart';
 import '../../widgets/change_password_modal.dart';
 import '../../widgets/user_guide_modal.dart';
 import '../../widgets/privacy_policy_modal.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  final VoidCallback? onBack;
+
+  const SettingsScreen({Key? key, this.onBack}) : super(key: key);
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -27,52 +27,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppConfig.backgroundColor,
-      appBar: const CustomAppBar(),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          children: [
-            _buildHeader(),
-            _spacing16,
-            _buildPersonalInfoSection(),
-            _spacing16,
-            _buildAppearanceSection(),
-            _spacing16,
-            _buildSecuritySection(),
-            _spacing16,
-            _buildNotificationSection(),
-            _spacing16,
-            _buildExportDataSection(),
-            _spacing16,
-            _buildAppInfoSection(),
-            _spacing16,
-            _buildPrivacySection(),
-            _spacing16,
-            _buildHelpSection(),
-            _spacing16,
-            _buildLogoutButton(),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-      bottomNavigationBar: CustomBottomNav(
-        currentIndex: 3,
-        onItemSelected: _handleNavigation,
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        children: [
+          _buildHeader(),
+          _spacing16,
+          _buildPersonalInfoSection(),
+          _spacing16,
+          _buildAppearanceSection(),
+          _spacing16,
+          _buildSecuritySection(),
+          _spacing16,
+          _buildNotificationSection(),
+          _spacing16,
+          _buildExportDataSection(),
+          _spacing16,
+          _buildAppInfoSection(),
+          _spacing16,
+          _buildPrivacySection(),
+          _spacing16,
+          _buildHelpSection(),
+          _spacing16,
+          _buildLogoutButton(),
+          const SizedBox(height: 80),
+        ],
       ),
     );
-  }
-
-  void _handleNavigation(int index) {
-    final routes = {
-      0: '/dashboard',
-      1: '/insight',
-      2: '/more',
-    };
-    if (routes.containsKey(index)) {
-      Navigator.pushReplacementNamed(context, routes[index]!);
-    }
   }
 
   void _handleLogout() {
@@ -162,7 +143,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: () {
+            if (widget.onBack != null) {
+              widget.onBack!();
+            } else {
+              Navigator.pop(context);
+            }
+          },
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: const [
