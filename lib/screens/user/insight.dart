@@ -248,7 +248,7 @@ class _CorrelationCard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: reliabilityColor.withOpacity(0.06),
+                  color: reliabilityColor.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(
                     width: 1.25,
