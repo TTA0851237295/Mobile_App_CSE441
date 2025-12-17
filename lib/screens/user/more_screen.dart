@@ -2,8 +2,22 @@ import 'package:flutter/material.dart';
 import '../../config/app_config.dart';
 import '../../widgets/more_menu_item.dart';
 
-class MoreScreen extends StatelessWidget {
+class MoreScreen extends StatefulWidget {
   const MoreScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> {
+  void _handleLogout() {
+    // Navigate to login screen and clear navigation stack
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/login',
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,14 +123,18 @@ class MoreScreen extends StatelessWidget {
           ),
 
           // Logout Button
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: _buildLogoutIcon(),
+          InkWell(
+            onTap: _handleLogout,
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: _buildLogoutIcon(),
+              ),
             ),
           ),
         ],
@@ -169,7 +187,7 @@ class MoreScreen extends StatelessWidget {
           title: 'Cài đặt',
           subtitle: 'Quản lý tài khoản và ứng dụng',
           onTap: () {
-            // TODO: Navigate to Settings screen
+            Navigator.pushNamed(context, '/settings');
           },
         ),
       ],
