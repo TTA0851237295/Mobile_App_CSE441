@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobileapp_taman/widgets/layout/app_shell.dart';
+import 'package:mobileapp_taman/widgets/layout/app_shell_admin.dart';
 import '../../widgets/app_shell.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -10,6 +12,16 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   int _index = 0; // 0 = Login, 1 = Register
+
+  // 👉 controller để đọc username (PHỤC VỤ PHÂN QUYỀN)
+  final TextEditingController _usernameController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +42,7 @@ class _AuthScreenState extends State<AuthScreen> {
               children: [
                 const SizedBox(height: 40),
 
-                // ===== HEADER (KHÔNG BAO GIỜ NHẢY) =====
+                // ===== HEADER =====
                 const _Header(),
 
                 const SizedBox(height: 28),
@@ -50,7 +62,12 @@ class _AuthScreenState extends State<AuthScreen> {
                 // ===== BODY =====
                 IndexedStack(
                   index: _index,
-                  children: const [_LoginForm(), _RegisterForm()],
+                  children: [
+                    _LoginForm(
+                      usernameController: _usernameController,
+                    ),
+                    const _RegisterForm(),
+                  ],
                 ),
 
                 const SizedBox(height: 40),
@@ -194,7 +211,9 @@ class _TabItem extends StatelessWidget {
 //
 
 class _LoginForm extends StatelessWidget {
-  const _LoginForm();
+  final TextEditingController usernameController;
+
+  const _LoginForm({required this.usernameController});
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +221,7 @@ class _LoginForm extends StatelessWidget {
       children: [
         const _Label(text: 'Tên đăng nhập'),
         const SizedBox(height: 8),
-        const _InputField(),
+        _InputField(controller: usernameController),
 
         const SizedBox(height: 20),
 
@@ -223,12 +242,25 @@ class _LoginForm extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const AppShell()),
-              );
-            },
+              final username = usernameController.text.trim();
 
+              // ✅ PHÂN QUYỀN TẠI ĐÂY
+              if (username == 'admin') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AppShellAdmin(),
+                  ),
+                );
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AppShell(),
+                  ),
+                );
+              }
+            },
             child: const Text(
               'Đăng nhập',
               style: TextStyle(
@@ -265,9 +297,11 @@ class _LoginForm extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 8),
-                Text('👤 Admin: admin / admin123', textAlign: TextAlign.center),
+                Text('👤 Admin: admin / admin123',
+                    textAlign: TextAlign.center),
                 SizedBox(height: 4),
-                Text('👤 User: demo / demo123', textAlign: TextAlign.center),
+                Text('👤 User: demo / demo123',
+                    textAlign: TextAlign.center),
               ],
             ),
           ),
@@ -318,9 +352,7 @@ class _RegisterForm extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {
-                // TODO: xử lý register
-              },
+              onPressed: () {},
               child: const Text(
                 'Đăng ký',
                 style: TextStyle(
@@ -403,11 +435,14 @@ class _Label extends StatelessWidget {
 
 class _InputField extends StatelessWidget {
   final bool obscure;
-  const _InputField({this.obscure = false});
+  final TextEditingController? controller;
+
+  const _InputField({this.obscure = false, this.controller});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       obscureText: obscure,
       decoration: InputDecoration(
         filled: true,
