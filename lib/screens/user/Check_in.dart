@@ -143,7 +143,7 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                                       color: Colors.white.withValues(alpha: 0.20),
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(8)),
+                                          BorderRadius.circular(8)),
                                     ),
                                     child: const Text(
                                       '3 check-in hôm nay',
@@ -164,7 +164,7 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         width: 324.67,
@@ -174,7 +174,7 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                                           color: Colors.white,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(100),
+                                            BorderRadius.circular(100),
                                           ),
                                         ),
                                       ),
@@ -234,7 +234,7 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                                         color: const Color(0xFFECEEF2),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(8),
+                                          BorderRadius.circular(8),
                                         ),
                                       ),
                                       child: const Text(
@@ -287,102 +287,102 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                           // Note Section
                           _isNoteExpanded
                               ? Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: ShapeDecoration(
-                                    color: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                        width: 1.27,
-                                        color: Colors.black.withValues(alpha: 0.10),
-                                      ),
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                  ),
-                                  child: TextField(
-                                    controller: _noteController,
-                                    maxLines: 4,
-                                    autofocus: true,
-                                    decoration: InputDecoration(
-                                      hintText: 'Ghi chú thêm về cảm xúc của bạn (tùy chọn)...',
-                                      hintStyle: const TextStyle(
-                                        color: Color(0xFF717182),
-                                        fontSize: 16,
-                                        fontFamily: 'Arimo',
-                                        fontWeight: FontWeight.w400,
-                                        height: 1.50,
-                                      ),
-                                      filled: true,
-                                      fillColor: const Color(0xFFF3F3F5),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: BorderSide(
-                                          width: 1.27,
-                                          color: Colors.black.withValues(alpha: 0),
-                                        ),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: BorderSide(
-                                          width: 1.27,
-                                          color: Colors.black.withValues(alpha: 0),
-                                        ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: BorderSide(
-                                          width: 1.27,
-                                          color: Colors.black.withValues(alpha: 0.1),
-                                        ),
-                                      ),
-                                      contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
-                                      ),
-                                    ),
-                                    style: const TextStyle(
-                                      color: Color(0xFF0A0A0A),
-                                      fontSize: 16,
-                                      fontFamily: 'Arimo',
-                                      fontWeight: FontWeight.w400,
-                                      height: 1.50,
-                                    ),
-                                  ),
-                                )
-                              : GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _isNoteExpanded = true;
-                                    });
-                                  },
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 36,
-                                    decoration: ShapeDecoration(
-                                      color: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        side: BorderSide(
-                                          width: 0.67,
-                                          color: Colors.black.withValues(alpha: 0.10),
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        'Thêm ghi chú (tùy chọn)',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Color(0xFF0A0A0A),
-                                          fontSize: 14,
-                                          fontFamily: 'Arimo',
-                                          fontWeight: FontWeight.w400,
-                                          height: 1.43,
-                                        ),
-                                      ),
-                                    ),
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: ShapeDecoration(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1.27,
+                                  color: Colors.black.withValues(alpha: 0.10),
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: TextField(
+                              controller: _noteController,
+                              maxLines: 4,
+                              autofocus: true,
+                              decoration: InputDecoration(
+                                hintText: 'Ghi chú thêm về cảm xúc của bạn (tùy chọn)...',
+                                hintStyle: const TextStyle(
+                                  color: Color(0xFF717182),
+                                  fontSize: 16,
+                                  fontFamily: 'Arimo',
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.50,
+                                ),
+                                filled: true,
+                                fillColor: const Color(0xFFF3F3F5),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    width: 1.27,
+                                    color: Colors.black.withValues(alpha: 0),
                                   ),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    width: 1.27,
+                                    color: Colors.black.withValues(alpha: 0),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    width: 1.27,
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Color(0xFF0A0A0A),
+                                fontSize: 16,
+                                fontFamily: 'Arimo',
+                                fontWeight: FontWeight.w400,
+                                height: 1.50,
+                              ),
+                            ),
+                          )
+                              : GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isNoteExpanded = true;
+                              });
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              height: 36,
+                              decoration: ShapeDecoration(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    width: 0.67,
+                                    color: Colors.black.withValues(alpha: 0.10),
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Thêm ghi chú (tùy chọn)',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xFF0A0A0A),
+                                    fontSize: 14,
+                                    fontFamily: 'Arimo',
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.43,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: 16),
 
                           // Complete Button
@@ -728,4 +728,3 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
     );
   }
 }
-

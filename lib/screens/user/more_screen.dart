@@ -2,8 +2,31 @@ import 'package:flutter/material.dart';
 import '../../config/app_config.dart';
 import '../../widgets/more_menu_item.dart';
 
-class MoreScreen extends StatelessWidget {
-  const MoreScreen({Key? key}) : super(key: key);
+class MoreScreen extends StatefulWidget {
+  final VoidCallback? onNavigateToJournal;
+  final VoidCallback? onNavigateToGoals;
+  final VoidCallback? onNavigateToSettings;
+
+  const MoreScreen({
+    Key? key,
+    this.onNavigateToJournal,
+    this.onNavigateToGoals,
+    this.onNavigateToSettings,
+  }) : super(key: key);
+
+  @override
+  State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> {
+  void _handleLogout() {
+    // Navigate to login screen and clear navigation stack
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/login',
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,14 +132,18 @@ class MoreScreen extends StatelessWidget {
           ),
 
           // Logout Button
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: _buildLogoutIcon(),
+          InkWell(
+            onTap: _handleLogout,
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: _buildLogoutIcon(),
+              ),
             ),
           ),
         ],
@@ -149,7 +176,7 @@ class MoreScreen extends StatelessWidget {
           title: 'Mục tiêu',
           subtitle: 'Đặt và theo dõi mục tiêu sức khỏe',
           onTap: () {
-            // TODO: Navigate to Goals screen
+            widget.onNavigateToGoals?.call();
           },
         ),
         const SizedBox(height: 12),
@@ -159,7 +186,7 @@ class MoreScreen extends StatelessWidget {
           title: 'Nhật ký',
           subtitle: 'Ghi chú chi tiết cảm xúc',
           onTap: () {
-            Navigator.pushNamed(context, '/journal');
+            widget.onNavigateToJournal?.call();
           },
         ),
         const SizedBox(height: 12),
@@ -169,7 +196,7 @@ class MoreScreen extends StatelessWidget {
           title: 'Cài đặt',
           subtitle: 'Quản lý tài khoản và ứng dụng',
           onTap: () {
-            // TODO: Navigate to Settings screen
+            widget.onNavigateToSettings?.call();
           },
         ),
       ],

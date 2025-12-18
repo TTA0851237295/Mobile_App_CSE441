@@ -435,13 +435,13 @@ class CheckInSummaryScreen extends StatelessWidget {
   }
 
   Widget _buildHistoryItem(
-    String emotion,
-    String time,
-    Color bgColor,
-    bool hasNote,
-    IconData emotionIcon,
-    Color iconColor,
-  ) {
+      String emotion,
+      String time,
+      Color bgColor,
+      bool hasNote,
+      IconData emotionIcon,
+      Color iconColor,
+      ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -523,4 +523,3 @@ class CheckInSummaryScreen extends StatelessWidget {
     );
   }
 }
-
