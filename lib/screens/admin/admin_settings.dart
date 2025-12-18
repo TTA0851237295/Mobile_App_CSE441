@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'admin_setting_screen.dart';
+import 'package:mobileapp_taman/screens/auth/auths_screen.dart';
 
 class AdminSettingsBody extends StatelessWidget {
-  final VoidCallback onOpenSettings;   // mở trang setting chi tiết
+  final VoidCallback onOpenSettings; // mở trang setting chi tiết
 
-  const AdminSettingsBody({
-    super.key,
-    required this.onOpenSettings,
-  });
+  const AdminSettingsBody({super.key, required this.onOpenSettings});
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +56,7 @@ class _Header extends StatelessWidget {
         SizedBox(height: 4),
         Text(
           'Quản lý cài đặt admin',
-          style: TextStyle(
-            fontSize: 16,
-            color: Color(0xFF495565),
-          ),
+          style: TextStyle(fontSize: 16, color: Color(0xFF495565)),
         ),
       ],
     );
@@ -106,12 +100,15 @@ class _ProfileCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('admin',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                  Text(
+                    'admin',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
                   SizedBox(height: 2),
-                  Text('Quản trị viên',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF495565))),
+                  Text(
+                    'Quản trị viên',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF495565)),
+                  ),
                 ],
               ),
             ),
@@ -159,16 +156,22 @@ void _showLogoutDialog(BuildContext context) {
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    // TODO: hành động đăng xuất thực sự
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AuthScreen(),
+                      ), // ⭐ màn đăng nhập
+                      (route) => false, // xoá toàn bộ stack
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white),
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                  ),
                   child: const Text("Đăng xuất"),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -188,7 +191,7 @@ class _SettingsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(14),
-      onTap: onTap,   // ⭐ chuyển sang tab Setting chi tiết
+      onTap: onTap, // ⭐ chuyển sang tab Setting chi tiết
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -212,12 +215,15 @@ class _SettingsCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Cài đặt',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                  Text(
+                    'Cài đặt',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
                   SizedBox(height: 2),
-                  Text('Tùy chỉnh tài khoản admin',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF495565))),
+                  Text(
+                    'Tùy chỉnh tài khoản admin',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF495565)),
+                  ),
                 ],
               ),
             ),

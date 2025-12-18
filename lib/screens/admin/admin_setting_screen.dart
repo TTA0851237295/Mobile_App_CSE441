@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'change_password_modal.dart';
+import 'package:mobileapp_taman/screens/auth/auths_screen.dart';
 
 class AdminSettingsScreen extends StatelessWidget {
   final VoidCallback onBack;
@@ -16,13 +17,15 @@ class AdminSettingsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               // 🔙 Quay lại
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFF8A2BE2)),
-                    onPressed: onBack,   // <<< QUAN TRỌNG
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Color(0xFF8A2BE2),
+                    ),
+                    onPressed: onBack, // <<< QUAN TRỌNG
                   ),
                   const SizedBox(width: 4),
                   const Text(
@@ -31,7 +34,6 @@ class AdminSettingsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
 
               const SizedBox(height: 12),
 
@@ -87,10 +89,10 @@ class AdminSettingsScreen extends StatelessWidget {
                         Text(
                           "Giao diện tối giúp giảm mỏi mắt",
                           style: TextStyle(fontSize: 13, color: Colors.grey),
-                        )
+                        ),
                       ],
                     ),
-                    Switch(value: false, onChanged: (_) {})
+                    Switch(value: false, onChanged: (_) {}),
                   ],
                 ),
               ),
@@ -110,7 +112,10 @@ class AdminSettingsScreen extends StatelessWidget {
                         builder: (_) => const ChangePasswordModal(),
                       );
                     },
-                    icon: const Icon(Icons.key, color: Color(0xFF8A2BE2)),
+                    icon: const Icon(
+                      Icons.key,
+                      color: Color.fromARGB(255, 0, 0, 0),
+                    ),
                     label: const Text(
                       "Đổi mật khẩu",
                       style: TextStyle(color: Color(0xFF0A0A0A)),
@@ -148,7 +153,14 @@ class AdminSettingsScreen extends StatelessWidget {
                 child: Container(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AuthScreen()),
+                        (route) => false,
+                      );
+                    },
+
                     icon: const Icon(Icons.logout, color: Colors.red),
                     label: const Text(
                       "Đăng xuất",
@@ -222,7 +234,7 @@ class _sectionCard extends StatelessWidget {
             color: Colors.purple.shade50,
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
