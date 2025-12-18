@@ -16,6 +16,46 @@ class CheckInSummaryScreen extends StatelessWidget {
     this.note,
   });
 
+  // Helper để lấy emoji cho location
+  String _getLocationEmoji(String location) {
+    final map = {
+      'Công ty': '🏢',
+      'Ở nhà': '🏠',
+      'Đang di chuyển': '🚗',
+      'Ngoài trời': '🌳',
+      'Khác': '📍',
+    };
+    return map[location] ?? '📍';
+  }
+
+  // Helper để lấy emoji cho activity
+  String _getActivityEmoji(String activity) {
+    final map = {
+      'Code': '💻',
+      'Học bài': '📚',
+      'Lướt mạng': '📱',
+      'Ăn uống': '🍽️',
+      'Tập thể dục': '🏃',
+      'Thư giãn': '🧘',
+      'Khác': '✨',
+    };
+    return map[activity] ?? '✨';
+  }
+
+  // Helper để lấy emoji cho company
+  String _getCompanyEmoji(String company) {
+    final map = {
+      'Một mình': '🧑',
+      'Đồng nghiệp': '👔',
+      'Sếp': '👨‍💼',
+      'Gia đình': '👨‍👩‍👧‍👦',
+      'Bạn bè': '👯',
+      'Người yêu': '💑',
+      'Khác': '👥',
+    };
+    return map[company] ?? '👥';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,19 +274,19 @@ class CheckInSummaryScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           if (location != null) ...[
-                            _buildAnalysisRow('Địa điểm:', location!, const Color(0xFFEFF6FF)),
+                            _buildAnalysisRow('Địa điểm:', location!, const Color(0xFFEFF6FF), Icons.location_on, const Color(0xFF3B82F6), _getLocationEmoji(location!)),
                             const SizedBox(height: 12),
                           ],
                           if (activity != null) ...[
-                            _buildAnalysisRow('Hoạt động:', activity!, const Color(0xFFF0FDF4)),
+                            _buildAnalysisRow('Hoạt động:', activity!, const Color(0xFFF0FDF4), Icons.bolt, const Color(0xFF10B981), _getActivityEmoji(activity!)),
                             const SizedBox(height: 12),
                           ],
                           if (company != null) ...[
-                            _buildAnalysisRow('Đồng hành:', company!, const Color(0xFFFAF5FF)),
+                            _buildAnalysisRow('Đồng hành:', company!, const Color(0xFFFAF5FF), Icons.people, const Color(0xFF8B5CF6), _getCompanyEmoji(company!)),
                             const SizedBox(height: 12),
                           ],
                           if (note != null) ...[
-                            _buildAnalysisRow('Ghi chú:', note!, const Color(0xFFFFF7EC)),
+                            _buildAnalysisRow('Ghi chú:', note!, const Color(0xFFFFF7EC), Icons.edit_note, const Color(0xFFF59E0B), '📝'),
                           ],
                         ],
                       ),
@@ -347,7 +387,7 @@ class CheckInSummaryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAnalysisRow(String label, String value, Color bgColor) {
+  Widget _buildAnalysisRow(String label, String value, Color bgColor, IconData labelIcon, Color iconColor, String valueEmoji) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: ShapeDecoration(
@@ -357,16 +397,20 @@ class CheckInSummaryScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Color(0xFF0A0A0A),
-                fontSize: 14,
-                fontFamily: 'Arimo',
-                fontWeight: FontWeight.w400,
+          Row(
+            children: [
+              Icon(labelIcon, color: iconColor, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Color(0xFF0A0A0A),
+                  fontSize: 14,
+                  fontFamily: 'Arimo',
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
+            ],
           ),
           const SizedBox(width: 8),
           Container(
@@ -376,7 +420,7 @@ class CheckInSummaryScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             child: Text(
-              value,
+              '$valueEmoji $value',
               style: const TextStyle(
                 color: Color(0xFF030213),
                 fontSize: 12,
@@ -391,13 +435,13 @@ class CheckInSummaryScreen extends StatelessWidget {
   }
 
   Widget _buildHistoryItem(
-    String emotion,
-    String time,
-    Color bgColor,
-    bool hasNote,
-    IconData emotionIcon,
-    Color iconColor,
-  ) {
+      String emotion,
+      String time,
+      Color bgColor,
+      bool hasNote,
+      IconData emotionIcon,
+      Color iconColor,
+      ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -479,4 +523,3 @@ class CheckInSummaryScreen extends StatelessWidget {
     );
   }
 }
-

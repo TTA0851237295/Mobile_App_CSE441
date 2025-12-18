@@ -3,12 +3,12 @@ import '../../config/app_config.dart';
 import '../../models/check_in.dart';
 import '../../widgets/tag_chip.dart';
 import '../../widgets/stat_card.dart';
-import '../../widgets/custom_app_bar.dart';
-import '../../widgets/custom_bottom_nav.dart';
 import '../../utils/helpers.dart';
 
 class JournalScreen extends StatefulWidget {
-  const JournalScreen({Key? key}) : super(key: key);
+  final VoidCallback? onBack;
+
+  const JournalScreen({Key? key, this.onBack}) : super(key: key);
 
   @override
   State<JournalScreen> createState() => _JournalScreenState();
@@ -82,37 +82,19 @@ class _JournalScreenState extends State<JournalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppConfig.backgroundColor,
-      appBar: const CustomAppBar(),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          children: [
-            _buildTitle(),
-            const SizedBox(height: 16),
-            _buildDateFilter(),
-            const SizedBox(height: 16),
-            _buildStatCard(),
-            const SizedBox(height: 16),
-            _buildCheckInList(),
-          ],
-        ),
-      ),
-      bottomNavigationBar: CustomBottomNav(
-        currentIndex: 3, // Index cho Khác/More (vì Journal được truy cập từ đây)
-        onItemSelected: (index) {
-          // TODO: Navigate based on index
-          if (index == 0) {
-            Navigator.pushReplacementNamed(context, '/home');
-          } else if (index == 1) {
-            Navigator.pushReplacementNamed(context, '/dashboard');
-          } else if (index == 2) {
-            Navigator.pushReplacementNamed(context, '/insights');
-          } else if (index == 3) {
-            Navigator.pop(context); // Quay lại màn hình More
-          }
-        },
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        children: [
+          _buildTitle(),
+          const SizedBox(height: 16),
+          _buildDateFilter(),
+          const SizedBox(height: 16),
+          _buildStatCard(),
+          const SizedBox(height: 16),
+          _buildCheckInList(),
+          const SizedBox(height: 80), // Padding cho bottom nav
+        ],
       ),
     );
   }
@@ -123,7 +105,13 @@ class _JournalScreenState extends State<JournalScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: () {
+            if (widget.onBack != null) {
+              widget.onBack!();
+            } else {
+              Navigator.pop(context);
+            }
+          },
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: const [

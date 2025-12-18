@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobileapp_taman/widgets/layout/app_shell.dart';
-import 'package:mobileapp_taman/widgets/layout/app_shell_admin.dart';
+import '../../widgets/app_shell.dart';
+import '../../widgets/app_shell_admin.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -359,6 +359,46 @@ class _RegisterForm extends StatelessWidget {
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // ✅ PHẦN DƯỚI CÙNG (CARD “Dữ liệu lưu trên thiết bị”)
+          SizedBox(
+            width: double.infinity,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(255, 255, 255, 0.9),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE9D8FD)),
+              ),
+              child: const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 14,
+                    backgroundColor: Color(0xFFF3E8FF),
+                    child: Icon(
+                      Icons.lock_outline,
+                      size: 16,
+                      color: Color(0xFF7C3AED),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Dữ liệu của bạn được lưu 100% trên thiết bị này',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF495565),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
