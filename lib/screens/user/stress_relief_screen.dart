@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../user/Check_in.dart';
+import 'Check_in.dart';
 
 class StressReliefScreen extends StatefulWidget {
   const StressReliefScreen({super.key});
