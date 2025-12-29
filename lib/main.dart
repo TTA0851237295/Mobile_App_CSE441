@@ -4,6 +4,7 @@ import 'screens/user/journal_screen.dart';
 import 'screens/user/more_screen.dart';
 import 'screens/user/settings_screen.dart';
 import 'screens/user/goals_screen.dart';
+import 'providers/checkin_provider.dart';
 
 
 void main() {
@@ -15,21 +16,24 @@ class TamAnApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CheckInProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
 
-      // ❗ Đây là màn sẽ chạy đầu tiên trong app
-           home: const AuthScreen(),
+        // ❗ Đây là màn sẽ chạy đầu tiên trong app
+        home: const AuthScreen(),
 
-           routes: {
-             '/login': (context) => const AuthScreen(),
-             '/journal': (context) => const JournalScreen(),
-             '/more': (context) => const MoreScreen(),
-             '/settings': (context) => const SettingsScreen(),
-             '/goals': (context) => const GoalsScreen(),
-           },
-
-
+        routes: {
+          '/login': (context) => const AuthScreen(),
+          '/journal': (context) => const JournalScreen(),
+          '/more': (context) => const MoreScreen(),
+          '/settings': (context) => const SettingsScreen(),
+          '/goals': (context) => const GoalsScreen(),
+        },
+      ),
     );
   }
 }
