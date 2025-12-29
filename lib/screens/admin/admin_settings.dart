@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobileapp_taman/screens/auth/auths_screen.dart';
+import '../auth/auths_screen.dart';
 
 class AdminSettingsBody extends StatelessWidget {
   final VoidCallback onOpenSettings; // mở trang setting chi tiết

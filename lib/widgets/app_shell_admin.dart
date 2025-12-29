@@ -3,6 +3,7 @@ import 'app_bar_admin.dart';
 import 'bottom_nav_admin.dart';
 import '../screens/admin/admin_home.dart';
 import '../screens/admin/admin_settings.dart';
+import '../screens/admin/admin_setting_screen.dart';
 
 
 // nếu chưa có, có thể để tạm Container()
@@ -27,7 +28,7 @@ class _AppShellAdminState extends State<AppShellAdmin> {
   AdminSettingsBody(
     onOpenSettings: () {
       setState(() {
-        _currentIndex = 2; 
+        _currentIndex = 2;
       });
     },
   ),

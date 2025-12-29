@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'change_password_modal.dart';
-import 'package:mobileapp_taman/screens/auth/auths_screen.dart';
+import '../../widgets/change_password_modal.dart';
+import '../auth/auths_screen.dart';
 
 class AdminSettingsScreen extends StatelessWidget {
   final VoidCallback onBack;
