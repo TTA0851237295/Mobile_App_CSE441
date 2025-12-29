@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'CheckInSummary.dart';
+import 'CheckInSummary.dart'; // already correct, but ensure case matches file
 import '../../widgets/custom_app_bar.dart';
 import '../../providers/checkin_provider.dart';
 import '../../models/check_in.dart' as models;

@@ -3,6 +3,7 @@ import 'app_bar_admin.dart';
 import 'bottom_nav_admin.dart';
 import '../screens/admin/admin_home.dart';
 import '../screens/admin/admin_settings.dart';
+import '../screens/admin/admin_setting_screen.dart';
 
 
 // nếu chưa có, có thể để tạm Container()
@@ -17,18 +18,33 @@ class AppShellAdmin extends StatefulWidget {
 class _AppShellAdminState extends State<AppShellAdmin> {
   int _currentIndex = 0;
 
-  // 👉 CÁC BODY CỦA ADMIN
-  final List<Widget> _pages = const [
-    AdminDashboardBody(),   // index 0 - Quản trị
-    AdminSettingsBody(),  // index 1 - Cài đặt
-  ];
-
   @override
   Widget build(BuildContext context) {
+    /// ⭐⭐ TẠO DANH SÁCH PAGES NGAY TRONG BUILD() ⭐⭐
+    final List<Widget> _pages = [
+  AdminDashboardBody(),
+
+  // Trang Settings tổng quan
+  AdminSettingsBody(
+    onOpenSettings: () {
+      setState(() {
+        _currentIndex = 2;
+      });
+    },
+  ),
+
+  // Trang Settings chi tiết
+  AdminSettingsScreen(
+    onBack: () {
+      setState(() {
+        _currentIndex = 1; // quay về tab Setting tổng quan
+      });
+    },
+  ),
+];
     return Scaffold(
       appBar: const AppBarAdmin(),
 
-      // 👉 CHỈ BODY THAY ĐỔI
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
