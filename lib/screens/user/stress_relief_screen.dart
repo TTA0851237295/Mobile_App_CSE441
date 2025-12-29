@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../user/Check_in.dart';
+import '../../providers/checkin_provider.dart';
 
 class StressReliefScreen extends StatefulWidget {
   const StressReliefScreen({super.key});
@@ -13,6 +15,9 @@ class _StressReliefScreenState extends State<StressReliefScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final checkInProvider = Provider.of<CheckInProvider>(context);
+    final latestAdvice = checkInProvider.latestAdvice ?? 'Hãy thử kỹ thuật hít thở 4-7-8 để giảm căng thẳng nhé!';
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -204,8 +209,8 @@ class _StressReliefScreenState extends State<StressReliefScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: RichText(
-                                        text: const TextSpan(
-                                          style: TextStyle(
+                                        text: TextSpan(
+                                          style: const TextStyle(
                                             color: Color(0xFF0A0A0A),
                                             fontSize: 14,
                                             fontFamily: 'Arimo',
@@ -213,14 +218,14 @@ class _StressReliefScreenState extends State<StressReliefScreen> {
                                             height: 1.43,
                                           ),
                                           children: [
-                                            TextSpan(
+                                            const TextSpan(
                                               text: 'Lời nhắc từ Tâm An: ',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ),
                                             TextSpan(
-                                              text: 'Hãy thử kỹ thuật hít thở 4-7-8 để giảm căng thẳng nhé!',
+                                              text: latestAdvice,
                                             ),
                                           ],
                                         ),

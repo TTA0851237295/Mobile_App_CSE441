@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import '../../providers/checkin_provider.dart';
 
 class CheckInSummaryScreen extends StatelessWidget {
   final String emotion;
@@ -31,6 +34,7 @@ class CheckInSummaryScreen extends StatelessWidget {
   // Helper để lấy emoji cho activity
   String _getActivityEmoji(String activity) {
     final map = {
+      'Họp': '💼',
       'Code': '💻',
       'Học bài': '📚',
       'Lướt mạng': '📱',
@@ -56,8 +60,116 @@ class CheckInSummaryScreen extends StatelessWidget {
     return map[company] ?? '👥';
   }
 
+  // Helper để lấy icon cho cảm xúc
+  IconData _getEmotionIcon(String emotion) {
+    final map = {
+      'Vui vẻ': Icons.sentiment_satisfied_alt_outlined,
+      'Buồn': Icons.sentiment_dissatisfied_outlined,
+      'Lo lắng': Icons.sentiment_dissatisfied_outlined,
+      'Căng thẳng': Icons.bolt_outlined,
+      'Tức giận': Icons.sentiment_very_dissatisfied_outlined,
+      'Bình thường': Icons.sentiment_neutral_outlined,
+      'Hạnh phúc': Icons.sentiment_very_satisfied_outlined,
+      'Mệt mỏi': Icons.bedtime_outlined,
+      'Hứng thú': Icons.star_outlined,
+    };
+    return map[emotion] ?? Icons.sentiment_satisfied_alt_outlined;
+  }
+
+  // Helper để lấy màu cho cảm xúc
+  Color _getEmotionColor(String emotion) {
+    final map = {
+      'Vui vẻ': Colors.green,
+      'Buồn': Colors.blue,
+      'Lo lắng': Colors.purple,
+      'Căng thẳng': Colors.orange,
+      'Tức giận': Colors.red,
+      'Bình thường': Colors.grey,
+      'Hạnh phúc': Colors.yellow,
+      'Mệt mỏi': Colors.blueGrey,
+      'Hứng thú': Colors.pink,
+    };
+    return map[emotion] ?? Colors.purple;
+  }
+
+  // Helper để lấy màu nền cho cảm xúc
+  Color _getEmotionBgColor(String emotion) {
+    final map = {
+      'Vui vẻ': const Color(0xFFDCFCE7),
+      'Buồn': const Color(0xFFDBEAFE),
+      'Lo lắng': const Color(0xFFF2E7FE),
+      'Căng thẳng': const Color(0xFFFFEDD4),
+      'Tức giận': const Color(0xFFFEE2E2),
+      'Bình thường': const Color(0xFFF3F4F6),
+      'Hạnh phúc': const Color(0xFFFEF9C3),
+      'Mệt mỏi': const Color(0xFFE0E7FF),
+      'Hứng thú': const Color(0xFFFCE7F3),
+    };
+    return map[emotion] ?? const Color(0xFFF2E7FE);
+  }
+
+  // Helper để tạo lời khuyên dựa trên cảm xúc và nguyên nhân
+  String _getPersonalizedAdvice() {
+    // Lời khuyên dựa trên cảm xúc
+    final emotionAdvice = {
+      'Vui vẻ': 'Thật tuyệt khi bạn đang cảm thấy vui vẻ! Hãy tận hưởng khoảnh khắc này và chia sẻ năng lượng tích cực với những người xung quanh nhé! 😊',
+      'Buồn': 'Không sao đâu, buồn là cảm xúc bình thường. Hãy cho phép bản thân được cảm nhận và thử nói chuyện với ai đó bạn tin tưởng. Mọi chuyện rồi sẽ qua thôi. 💙',
+      'Lo lắng': 'Bạn có vẻ lo lắng. Hãy thử kỹ thuật hít thở 4-7-8: hít vào 4 giây, nín thở 7 giây, thở ra 8 giây. Mọi việc sẽ ổn thôi! 🧘‍♀️',
+      'Căng thẳng': 'Căng thẳng có thể ảnh hưởng đến sức khỏe. Hãy nghỉ ngơi 5-10 phút, đi dạo hoặc nghe nhạc nhẹ để giảm áp lực nhé! 🎵',
+      'Tức giận': 'Khi tức giận, hãy đếm từ 1 đến 10 và hít thở sâu. Tránh đưa ra quyết định khi đang trong trạng thái này. Bạn làm được mà! 💪',
+      'Bình thường': 'Cảm giác bình thường cũng rất tốt! Đây là lúc tốt để lập kế hoạch hoặc làm những việc bạn thích. 😌',
+      'Hạnh phúc': 'Tuyệt vời! Hạnh phúc là điều đáng trân trọng. Hãy ghi lại những gì khiến bạn hạnh phúc để nhớ lại khi cần nhé! ✨',
+      'Mệt mỏi': 'Cơ thể bạn đang cần nghỉ ngơi. Hãy ngủ đủ giấc, uống nước và tránh làm việc quá sức. Sức khỏe là quan trọng nhất! 😴',
+      'Hứng thú': 'Năng lượng tích cực! Hãy tận dụng trạng thái này để làm những việc bạn đam mê và sáng tạo! 🌟',
+    };
+
+    String advice = emotionAdvice[emotion] ?? 'Hãy dành thời gian chăm sóc bản thân và lắng nghe cảm xúc của mình nhé! 🌸';
+
+    // Thêm lời khuyên dựa trên nguyên nhân
+    List<String> contextAdvice = [];
+
+    if (location != null) {
+      if (location == 'Ở nhà' && (emotion == 'Lo lắng' || emotion == 'Buồn')) {
+        contextAdvice.add('Ở nhà có thể khiến bạn cảm thấy cô đơn. Hãy thử gọi điện cho bạn bè hoặc ra ngoài đi dạo.');
+      } else if (location == 'Công ty' && emotion == 'Căng thẳng') {
+        contextAdvice.add('Công việc có thể gây áp lực. Hãy nghỉ giải lao 5-10 phút mỗi giờ.');
+      }
+    }
+
+    if (activity != null) {
+      if (activity == 'Lướt mạng' && (emotion == 'Lo lắng' || emotion == 'Buồn')) {
+        contextAdvice.add('Việc lướt mạng quá nhiều có thể ảnh hưởng tiêu cực. Hãy thử đọc sách hoặc đi dạo thay thế.');
+      } else if (activity == 'Code' && emotion == 'Căng thẳng') {
+        contextAdvice.add('Code lâu có thể gây mệt mỏi. Hãy áp dụng kỹ thuật Pomodoro: 25 phút làm, 5 phút nghỉ.');
+      } else if (activity == 'Tập thể dục' && emotion == 'Vui vẻ') {
+        contextAdvice.add('Tập thể dục giúp bạn vui vẻ! Hãy duy trì thói quen này nhé.');
+      }
+    }
+
+    if (company != null) {
+      if (company == 'Một mình' && (emotion == 'Lo lắng' || emotion == 'Buồn')) {
+        contextAdvice.add('Thời gian một mình cũng cần thiết, nhưng đừng quên kết nối với người thân và bạn bè.');
+      } else if (company == 'Sếp' && emotion == 'Căng thẳng') {
+        contextAdvice.add('Gặp sếp có thể gây căng thẳng. Hãy chuẩn bị trước và tự tin vào khả năng của mình.');
+      } else if ((company == 'Gia đình' || company == 'Bạn bè') && emotion == 'Vui vẻ') {
+        contextAdvice.add('Thật tuyệt khi có thời gian với người thân! Những khoảnh khắc này rất quý giá.');
+      }
+    }
+
+    // Kết hợp lời khuyên
+    if (contextAdvice.isNotEmpty) {
+      return '${contextAdvice.join(' ')} $advice';
+    }
+
+    return advice;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final checkInProvider = Provider.of<CheckInProvider>(context);
+    final todayCount = checkInProvider.getTodayCheckInCount();
+    final personalizedAdvice = _getPersonalizedAdvice();
+
     return Scaffold(
       backgroundColor: Colors.black.withValues(alpha: 0.5),
       body: Center(
@@ -98,11 +210,11 @@ class CheckInSummaryScreen extends StatelessWidget {
                   // Header
                   Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Tổng kết hôm nay',
                               style: TextStyle(
                                 color: Color(0xFF0A0A0A),
@@ -112,10 +224,10 @@ class CheckInSummaryScreen extends StatelessWidget {
                                 letterSpacing: -0.45,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            const SizedBox(height: 6),
                             Text(
-                              'Bạn đã check-in 3 lần trong ngày hôm nay',
-                              style: TextStyle(
+                              'Bạn đã check-in $todayCount lần trong ngày hôm nay',
+                              style: const TextStyle(
                                 color: Color(0xFF495565),
                                 fontSize: 14,
                                 fontFamily: 'Arimo',
@@ -168,11 +280,15 @@ class CheckInSummaryScreen extends StatelessWidget {
                             Container(
                               width: 48,
                               height: 48,
-                              decoration: const ShapeDecoration(
-                                color: Color(0xFFF2E7FE),
-                                shape: CircleBorder(),
+                              decoration: ShapeDecoration(
+                                color: _getEmotionBgColor(emotion),
+                                shape: const CircleBorder(),
                               ),
-                              child: const Icon(Icons.sentiment_satisfied_alt_outlined, color: Colors.purple, size: 24),
+                              child: Icon(
+                                _getEmotionIcon(emotion),
+                                color: _getEmotionColor(emotion),
+                                size: 24,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Column(
@@ -189,7 +305,7 @@ class CheckInSummaryScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   location != null ? 'Tại: $location' : 'Không rõ địa điểm',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Color(0xFF495565),
                                     fontSize: 14,
                                     fontFamily: 'Arimo',
@@ -220,10 +336,10 @@ class CheckInSummaryScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Lời khuyên từ Tâm An',
                           style: TextStyle(
                             color: Color(0xFF0A0A0A),
@@ -232,10 +348,10 @@ class CheckInSummaryScreen extends StatelessWidget {
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
-                          'Bạn có vẻ lo lắng do môi trường ở nhà, việc sử dụng mạng xã hội, thời gian một mình. Hãy thử kỹ thuật hít thở 4-7-8: hít vào 4 giây, nín thở 7 giây, thở ra 8 giây. Mọi việc sẽ ổn thôi! 🧘‍♀️',
-                          style: TextStyle(
+                          personalizedAdvice,
+                          style: const TextStyle(
                             color: Color(0xFF354152),
                             fontSize: 14,
                             fontFamily: 'Arimo',
@@ -319,32 +435,36 @@ class CheckInSummaryScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _buildHistoryItem(
-                          'Vui vẻ',
-                          '10:14',
-                          const Color(0xFFDCFCE7),
-                          false,
-                          Icons.sentiment_satisfied_alt_outlined,
-                          Colors.green,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildHistoryItem(
-                          'Căng thẳng',
-                          '04:52',
-                          const Color(0xFFFFEDD4),
-                          true,
-                          Icons.bolt_outlined,
-                          Colors.orange,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildHistoryItem(
-                          'Lo lắng',
-                          '07:52',
-                          const Color(0xFFF2E7FE),
-                          true,
-                          Icons.sentiment_dissatisfied_outlined,
-                          Colors.purple,
-                        ),
+                        ...checkInProvider.getTodayCheckIns().map((checkIn) {
+                          final timeFormat = DateFormat('HH:mm');
+                          final hasNote = checkIn.note != null && checkIn.note!.isNotEmpty;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: _buildHistoryItem(
+                              checkIn.emotion,
+                              timeFormat.format(checkIn.timestamp),
+                              _getEmotionBgColor(checkIn.emotion),
+                              hasNote,
+                              _getEmotionIcon(checkIn.emotion),
+                              _getEmotionColor(checkIn.emotion),
+                            ),
+                          );
+                        }).toList(),
+                        if (checkInProvider.getTodayCheckIns().isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: Text(
+                                'Chưa có check-in nào hôm nay',
+                                style: TextStyle(
+                                  color: Color(0xFF697282),
+                                  fontSize: 14,
+                                  fontFamily: 'Arimo',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -353,6 +473,8 @@ class CheckInSummaryScreen extends StatelessWidget {
                   // Close Button
                   InkWell(
                     onTap: () {
+                      // Lưu lời khuyên vào provider
+                      checkInProvider.setLatestAdvice(personalizedAdvice);
                       // Trả về true để Check_in.dart hiển thị reminder dialog
                       Navigator.pop(context, true);
                     },

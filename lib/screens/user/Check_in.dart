@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'CheckInSummary.dart';
 import '../../widgets/custom_app_bar.dart';
+import '../../providers/checkin_provider.dart';
+import '../../models/check_in.dart' as models;
 
 class CheckInDetailScreen extends StatefulWidget {
   final String selectedEmotion;
@@ -35,6 +38,9 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final checkInProvider = Provider.of<CheckInProvider>(context);
+    final todayCount = checkInProvider.getTodayCheckInCount();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppBar(),
@@ -145,9 +151,9 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                                           borderRadius:
                                           BorderRadius.circular(8)),
                                     ),
-                                    child: const Text(
-                                      '3 check-in hôm nay',
-                                      style: TextStyle(
+                                    child: Text(
+                                      '$todayCount check-in hôm nay',
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
                                         fontFamily: 'Arimo',
@@ -237,9 +243,9 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                                           BorderRadius.circular(8),
                                         ),
                                       ),
-                                      child: const Text(
-                                        'Vui vẻ',
-                                        style: TextStyle(
+                                      child: Text(
+                                        _selectedEmotion,
+                                        style: const TextStyle(
                                           color: Color(0xFF030213),
                                           fontSize: 12,
                                           fontFamily: 'Arimo',
@@ -388,6 +394,20 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                           // Complete Button
                           InkWell(
                             onTap: () async {
+                              // Lưu check-in vào provider
+                              final checkInProvider = Provider.of<CheckInProvider>(context, listen: false);
+                              final newCheckIn = models.CheckIn(
+                                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                                userId: 'user1', // TODO: Lấy từ auth
+                                emotion: _selectedEmotion,
+                                timestamp: DateTime.now(),
+                                note: _noteController.text.isNotEmpty ? _noteController.text : null,
+                                location: _selectedLocation,
+                                activity: _selectedActivity,
+                                people: _selectedCompany,
+                              );
+                              checkInProvider.addCheckIn(newCheckIn);
+
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
