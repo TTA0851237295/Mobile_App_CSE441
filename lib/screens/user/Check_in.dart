@@ -4,6 +4,7 @@ import 'CheckInSummary.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../providers/checkin_provider.dart';
 import '../../config/app_config.dart';
+import '../../models/check_in.dart' as models;
 
 class CheckInDetailScreen extends StatefulWidget {
   final String selectedEmotion;
@@ -38,6 +39,9 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final checkInProvider = Provider.of<CheckInProvider>(context);
+    final todayCount = checkInProvider.getTodayCheckInCount();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppBar(),
@@ -148,9 +152,9 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                                           borderRadius:
                                           BorderRadius.circular(8)),
                                     ),
-                                    child: const Text(
-                                      '3 check-in hôm nay',
-                                      style: TextStyle(
+                                    child: Text(
+                                      '$todayCount check-in hôm nay',
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
                                         fontFamily: 'Arimo',
@@ -240,9 +244,9 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                                           BorderRadius.circular(8),
                                         ),
                                       ),
-                                      child: const Text(
-                                        'Vui vẻ',
-                                        style: TextStyle(
+                                      child: Text(
+                                        _selectedEmotion,
+                                        style: const TextStyle(
                                           color: Color(0xFF030213),
                                           fontSize: 12,
                                           fontFamily: 'Arimo',

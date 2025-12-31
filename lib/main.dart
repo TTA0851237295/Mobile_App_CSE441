@@ -10,6 +10,8 @@ import 'providers/checkin_provider.dart';
 import 'providers/goal_provider.dart';
 import 'providers/dashboard_provider.dart';
 import 'providers/insight_provider.dart';
+import 'providers/checkin_provider.dart';
+
 
 void main() {
   runApp(const TamAnApp());
