@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../config/app_config.dart';
 import '../../models/check_in.dart';
 import '../../widgets/tag_chip.dart';
 import '../../widgets/stat_card.dart';
 import '../../utils/helpers.dart';
+import '../../providers/checkin_provider.dart';
 
 class JournalScreen extends StatefulWidget {
   final VoidCallback? onBack;
@@ -18,45 +20,19 @@ class _JournalScreenState extends State<JournalScreen> {
   String? selectedDate;
   final ScrollController _scrollController = ScrollController();
 
-  // Mock data - Replace with actual data from provider
-  final List<CheckIn> _checkIns = [
-    CheckIn(
-      id: '1',
-      userId: 'user1',
-      emotion: 'Lo lắng',
-      timestamp: DateTime(2025, 12, 14, 9, 29),
-      location: '🏠 Ở nhà',
-      activity: '⚡ Lướt mạng',
-      people: '😴 Một mình',
-      note: 'Lo lắng cho tuần mới, nhiều deadline',
-    ),
-    CheckIn(
-      id: '2',
-      userId: 'user1',
-      emotion: 'Căng thẳng',
-      timestamp: DateTime(2025, 12, 14, 6, 29),
-      location: '🏠 Ở nhà',
-      activity: '✨ Khác',
-      people: '😴 Một mình',
-      note: 'Suy nghĩ về công việc tuần tới',
-    ),
-    CheckIn(
-      id: '3',
-      userId: 'user1',
-      emotion: 'Hạnh phúc',
-      timestamp: DateTime(2025, 12, 13, 7, 29),
-      location: '🌳 Ngoài trời',
-      activity: '🏃 Tập thể dục',
-      people: '👫 Bạn bè',
-      note: 'Chạy bộ với bạn bè, vui về',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CheckinProvider>().fetchCheckins();
+    });
+  }
 
-  List<String> get _availableDates {
+  List<String> _availableDates(List<CheckIn> checkIns) {
     final dates = ['Tất cả'];
     final uniqueDates = <String>{};
 
-    for (var checkIn in _checkIns) {
+    for (var checkIn in checkIns) {
       uniqueDates.add(Helpers.formatDate(checkIn.timestamp));
     }
 
@@ -64,12 +40,12 @@ class _JournalScreenState extends State<JournalScreen> {
     return dates;
   }
 
-  List<CheckIn> get _filteredCheckIns {
+  List<CheckIn> _filteredCheckIns(List<CheckIn> checkIns) {
     if (selectedDate == null || selectedDate == 'Tất cả') {
-      return _checkIns;
+      return checkIns;
     }
 
-    return _checkIns.where((checkIn) {
+    return checkIns.where((checkIn) {
       return Helpers.formatDate(checkIn.timestamp) == selectedDate;
     }).toList();
   }
@@ -82,20 +58,35 @@ class _JournalScreenState extends State<JournalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        children: [
-          _buildTitle(),
-          const SizedBox(height: 16),
-          _buildDateFilter(),
-          const SizedBox(height: 16),
-          _buildStatCard(),
-          const SizedBox(height: 16),
-          _buildCheckInList(),
-          const SizedBox(height: 80), // Padding cho bottom nav
-        ],
-      ),
+    return Consumer<CheckinProvider>(
+      builder: (context, checkinProvider, child) {
+        if (checkinProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final checkIns = checkinProvider.checkins;
+        final filteredCheckIns = _filteredCheckIns(checkIns);
+        final availableDates = _availableDates(checkIns);
+
+        return SafeArea(
+          child: RefreshIndicator(
+            onRefresh: () => checkinProvider.fetchCheckins(),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              children: [
+                _buildTitle(),
+                const SizedBox(height: 16),
+                _buildDateFilter(availableDates),
+                const SizedBox(height: 16),
+                _buildStatCard(filteredCheckIns),
+                const SizedBox(height: 16),
+                _buildCheckInList(filteredCheckIns),
+                const SizedBox(height: 80),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -154,16 +145,16 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _buildDateFilter() {
+  Widget _buildDateFilter(List<String> availableDates) {
     return SizedBox(
       height: 40,
       child: ListView.separated(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
-        itemCount: _availableDates.length,
+        itemCount: availableDates.length,
         separatorBuilder: (context, index) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final date = _availableDates[index];
+          final date = availableDates[index];
           final isSelected = selectedDate == date || (selectedDate == null && date == 'Tất cả');
 
           return _buildDateChip(date, isSelected);
@@ -205,17 +196,17 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _buildStatCard() {
+  Widget _buildStatCard(List<CheckIn> filteredCheckIns) {
     return StatCard(
       icon: Icons.calendar_today_outlined,
       label: 'Tổng số check-in',
-      value: '${_checkIns.length}',
+      value: '${filteredCheckIns.length}',
       iconColor: AppConfig.primaryColor,
     );
   }
 
-  Widget _buildCheckInList() {
-    if (_filteredCheckIns.isEmpty) {
+  Widget _buildCheckInList(List<CheckIn> filteredCheckIns) {
+    if (filteredCheckIns.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(32.0),
@@ -231,7 +222,7 @@ class _JournalScreenState extends State<JournalScreen> {
     }
 
     return Column(
-      children: _filteredCheckIns.map((checkIn) {
+      children: filteredCheckIns.map((checkIn) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: _buildCheckInCard(checkIn),
@@ -440,15 +431,15 @@ class _JournalScreenState extends State<JournalScreen> {
             child: const Text('Hủy'),
           ),
           TextButton(
-            onPressed: () {
-              // TODO: Implement delete logic with provider
-              setState(() {
-                _checkIns.removeWhere((c) => c.id == checkIn.id);
-              });
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã xóa check-in')),
-              );
+              // Refresh data from server
+              await context.read<CheckinProvider>().fetchCheckins();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Đã xóa check-in')),
+                );
+              }
             },
             child: const Text(
               'Xóa',

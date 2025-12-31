@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'CheckInSummary.dart'; // already correct, but ensure case matches file
+import 'package:provider/provider.dart';
+import 'CheckInSummary.dart';
 import '../../widgets/custom_app_bar.dart';
+import '../../providers/checkin_provider.dart';
+import '../../config/app_config.dart';
 
 class CheckInDetailScreen extends StatefulWidget {
   final String selectedEmotion;
@@ -388,24 +391,53 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                           // Complete Button
                           InkWell(
                             onTap: () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CheckInSummaryScreen(
-                                    emotion: _selectedEmotion,
-                                    location: _selectedLocation,
-                                    activity: _selectedActivity,
-                                    company: _selectedCompany,
-                                    note: _noteController.text.isNotEmpty
-                                        ? _noteController.text
-                                        : null,
-                                  ),
-                                ),
+                              final checkinProvider = Provider.of<CheckinProvider>(context, listen: false);
+                              
+                              // Map Vietnamese to English enums
+                              final locationEnum = AppConfig.locationToEnum[_selectedLocation] ?? 'OTHER';
+                              final activityEnum = AppConfig.activityToEnum[_selectedActivity] ?? 'OTHER';
+                              final peopleEnum = AppConfig.peopleToEnum[_selectedCompany] ?? 'OTHER';
+                              
+                              // Gọi API tạo check-in
+                              final success = await checkinProvider.createCheckin(
+                                emotion: _selectedEmotion,
+                                locationTag: locationEnum,
+                                activityTag: activityEnum,
+                                peopleTag: peopleEnum,
+                                note: _noteController.text.isNotEmpty ? _noteController.text : null,
                               );
 
-                              // Nếu result là true, quay về màn hình chính với thông báo
-                              if (result == true && context.mounted) {
-                                Navigator.pop(context, 'show_notification');
+                              if (!context.mounted) return;
+
+                              if (success) {
+                                // Navigate tới summary với data
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CheckInSummaryScreen(
+                                      emotion: _selectedEmotion,
+                                      location: _selectedLocation,
+                                      activity: _selectedActivity,
+                                      company: _selectedCompany,
+                                      note: _noteController.text.isNotEmpty
+                                          ? _noteController.text
+                                          : null,
+                                    ),
+                                  ),
+                                );
+
+                                // Nếu result là true, quay về màn hình chính với thông báo
+                                if (result == true && context.mounted) {
+                                  Navigator.pop(context, 'show_notification');
+                                }
+                              } else {
+                                // Hiển thị lỗi
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(checkinProvider.errorMessage ?? 'Có lỗi xảy ra'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
                               }
                             },
                             child: Container(

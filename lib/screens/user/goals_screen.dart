@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/create_goal_modal.dart';
+import '../../providers/goal_provider.dart';
 
 class GoalsScreen extends StatefulWidget {
   final VoidCallback? onBack;
@@ -12,18 +14,37 @@ class GoalsScreen extends StatefulWidget {
 
 class _GoalsScreenState extends State<GoalsScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<GoalProvider>().fetchGoals();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final goalProvider = Provider.of<GoalProvider>(context);
+    if (goalProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        children: [
-          _buildBackButton(),
-          const SizedBox(height: 24),
-          _buildHeader(),
-          const SizedBox(height: 24),
-          _buildActiveGoalsSection(),
-          const SizedBox(height: 80),
-        ],
+      child: RefreshIndicator(
+        onRefresh: () => context.read<GoalProvider>().fetchGoals(),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          children: [
+            _buildBackButton(),
+            const SizedBox(height: 24),
+            _buildHeader(),
+            const SizedBox(height: 24),
+            _buildActiveGoalsSection(goalProvider),
+            const SizedBox(height: 24),
+            if (goalProvider.completedGoals.isNotEmpty)
+              _buildCompletedGoalsSection(goalProvider),
+            const SizedBox(height: 80),
+          ],
+        ),
       ),
     );
   }
@@ -137,13 +158,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
     );
   }
 
-  Widget _buildActiveGoalsSection() {
+  Widget _buildActiveGoalsSection(GoalProvider goalProvider) {
+    final activeGoals = goalProvider.activeGoals;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Mục tiêu đang thực hiện (2)',
-          style: TextStyle(
+        Text(
+          'Mục tiêu đang thực hiện (${activeGoals.length})',
+          style: const TextStyle(
             color: Color(0xFF0A0A0A),
             fontSize: 18,
             fontFamily: 'Arimo',
@@ -151,11 +174,191 @@ class _GoalsScreenState extends State<GoalsScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        _buildGoalCard1(),
-        const SizedBox(height: 16),
-        _buildGoalCard2(),
+        if (activeGoals.isEmpty)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: Text(
+                'Chưa có mục tiêu nào.\nTạo mục tiêu đầu tiên của bạn!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF717182),
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          )
+        else
+          ...activeGoals.map((goal) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _buildGoalCard(goal, goalProvider),
+          )),
       ],
     );
+  }
+
+  Widget _buildCompletedGoalsSection(GoalProvider goalProvider) {
+    final completedGoals = goalProvider.completedGoals;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Đã hoàn thành (${completedGoals.length})',
+          style: const TextStyle(
+            color: Color(0xFF0A0A0A),
+            fontSize: 18,
+            fontFamily: 'Arimo',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ...completedGoals.map((goal) => Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: _buildGoalCard(goal, goalProvider),
+        )),
+      ],
+    );
+  }
+
+  Widget _buildGoalCard(goal, GoalProvider goalProvider) {
+    final isCompleted = goal.status == 'COMPLETED';
+    
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: const Color(0xFFF2E7FE),
+          width: 1.27,
+        ),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      goal.title,
+                      style: TextStyle(
+                        color: isCompleted ? const Color(0xFF717182) : const Color(0xFF0A0A0A),
+                        fontSize: 18,
+                        fontFamily: 'Arimo',
+                        fontWeight: FontWeight.w400,
+                        decoration: isCompleted ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      goal.description,
+                      style: const TextStyle(
+                        color: Color(0xFF717182),
+                        fontSize: 14,
+                        fontFamily: 'Arimo',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFAF5FF),
+                  border: Border.all(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  goal.category,
+                  style: const TextStyle(
+                    color: Color(0xFF0A0A0A),
+                    fontSize: 12,
+                    fontFamily: 'Arimo',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Mục tiêu: ${_formatDate(goal.targetDate)}',
+                style: const TextStyle(
+                  color: Color(0xFF717182),
+                  fontSize: 14,
+                ),
+              ),
+              Row(
+                children: [
+                  if (!isCompleted)
+                    IconButton(
+                      icon: const Icon(Icons.check_circle_outline, color: Color(0xFF22C55E)),
+                      onPressed: () async {
+                        await goalProvider.updateGoalStatus(goal.id, 'COMPLETED');
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Đã hoàn thành mục tiêu!')),
+                          );
+                        }
+                      },
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Xóa mục tiêu'),
+                          content: const Text('Bạn có chắc muốn xóa mục tiêu này?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Hủy'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Xóa'),
+                            ),
+                          ],
+                        ),
+                      );
+                      
+                      if (confirm == true && context.mounted) {
+                        await goalProvider.deleteGoal(goal.id);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Đã xóa mục tiêu')),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   Widget _buildGoalCard1() {

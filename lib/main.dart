@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/auth/auths_screen.dart';
 import 'screens/user/journal_screen.dart';
 import 'screens/user/more_screen.dart';
 import 'screens/user/settings_screen.dart';
 import 'screens/user/goals_screen.dart';
-
+import 'providers/auth_provider.dart';
+import 'providers/checkin_provider.dart';
+import 'providers/goal_provider.dart';
+import 'providers/dashboard_provider.dart';
+import 'providers/insight_provider.dart';
 
 void main() {
   runApp(const TamAnApp());
@@ -15,8 +20,22 @@ class TamAnApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => CheckinProvider()),
+        ChangeNotifierProvider(create: (_) => GoalProvider()),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
+        ChangeNotifierProxyProvider<CheckinProvider, InsightProvider>(
+          create: (context) => InsightProvider(
+            checkinProvider: context.read<CheckinProvider>(),
+          ),
+          update: (context, checkinProvider, previous) =>
+              previous ?? InsightProvider(checkinProvider: checkinProvider),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
 
       // ❗ Đây là màn sẽ chạy đầu tiên trong app
            home: const AuthScreen(),
@@ -28,8 +47,7 @@ class TamAnApp extends StatelessWidget {
              '/settings': (context) => const SettingsScreen(),
              '/goals': (context) => const GoalsScreen(),
            },
-
-
+      ),
     );
   }
 }

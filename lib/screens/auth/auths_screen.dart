@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/app_shell.dart';
 import '../../widgets/app_shell_admin.dart';
+import '../../providers/auth_provider.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -209,24 +211,63 @@ class _TabItem extends StatelessWidget {
 // ================= LOGIN FORM =================
 //
 
-class _LoginForm extends StatelessWidget {
+class _LoginForm extends StatefulWidget {
   final TextEditingController usernameController;
 
   const _LoginForm({required this.usernameController});
 
   @override
+  State<_LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<_LoginForm> {
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Column(
       children: [
+        // Hiển thị lỗi nếu có
+        if (authProvider.errorMessage != null)
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.red.shade200),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    authProvider.errorMessage!,
+                    style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
         const _Label(text: 'Tên đăng nhập'),
         const SizedBox(height: 8),
-        _InputField(controller: usernameController),
+        _InputField(controller: widget.usernameController),
 
         const SizedBox(height: 20),
 
         const _Label(text: 'Mật khẩu'),
         const SizedBox(height: 8),
-        const _InputField(obscure: true),
+        _InputField(obscure: true, controller: _passwordController),
 
         const SizedBox(height: 28),
 
@@ -240,34 +281,52 @@ class _LoginForm extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            onPressed: () {
-              final username = usernameController.text.trim();
+            onPressed: authProvider.isLoading ? null : () async {
+              final username = widget.usernameController.text.trim();
+              final password = _passwordController.text.trim();
 
-              // ✅ PHÂN QUYỀN TẠI ĐÂY
-              if (username == 'admin') {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AppShellAdmin(),
-                  ),
+              if (username.isEmpty || password.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin')),
                 );
-              } else {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AppShell(),
-                  ),
-                );
+                return;
+              }
+
+              // Gọi API login
+              final success = await authProvider.login(username, password);
+
+              if (success && mounted) {
+                // Phân quyền dựa trên role từ API
+                if (authProvider.currentUser?.isAdmin == true) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AppShellAdmin()),
+                  );
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AppShell()),
+                  );
+                }
               }
             },
-            child: const Text(
-              'Đăng nhập',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: authProvider.isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text(
+                    'Đăng nhập',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
           ),
         ),
 
@@ -314,30 +373,89 @@ class _LoginForm extends StatelessWidget {
 // ================= REGISTER FORM =================
 //
 
-class _RegisterForm extends StatelessWidget {
+class _RegisterForm extends StatefulWidget {
   const _RegisterForm();
 
   @override
+  State<_RegisterForm> createState() => _RegisterFormState();
+}
+
+class _RegisterFormState extends State<_RegisterForm> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _fullNameController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 40),
       child: Column(
         children: [
+          // Hiển thị lỗi nếu có
+          if (authProvider.errorMessage != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      authProvider.errorMessage!,
+                      style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          const _Label(text: 'Họ và tên'),
+          const SizedBox(height: 8),
+          _InputField(controller: _fullNameController),
+
+          const SizedBox(height: 20),
+
+          const _Label(text: 'Email'),
+          const SizedBox(height: 8),
+          _InputField(controller: _emailController),
+
+          const SizedBox(height: 20),
+
           const _Label(text: 'Tên đăng nhập'),
           const SizedBox(height: 8),
-          const _InputField(),
+          _InputField(controller: _usernameController),
 
           const SizedBox(height: 20),
 
           const _Label(text: 'Mật khẩu'),
           const SizedBox(height: 8),
-          const _InputField(obscure: true),
+          _InputField(obscure: true, controller: _passwordController),
 
           const SizedBox(height: 20),
 
           const _Label(text: 'Xác nhận mật khẩu'),
           const SizedBox(height: 8),
-          const _InputField(obscure: true),
+          _InputField(obscure: true, controller: _confirmPasswordController),
 
           const SizedBox(height: 28),
 
@@ -351,15 +469,63 @@ class _RegisterForm extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {},
-              child: const Text(
-                'Đăng ký',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              onPressed: authProvider.isLoading ? null : () async {
+                final username = _usernameController.text.trim();
+                final password = _passwordController.text.trim();
+                final confirmPassword = _confirmPasswordController.text.trim();
+                final fullName = _fullNameController.text.trim();
+                final email = _emailController.text.trim();
+
+                if (username.isEmpty || password.isEmpty || fullName.isEmpty || email.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin')),
+                  );
+                  return;
+                }
+
+                if (password != confirmPassword) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Mật khẩu xác nhận không khớp')),
+                  );
+                  return;
+                }
+
+                // Gọi API register
+                final success = await authProvider.register(
+                  username: username,
+                  password: password,
+                  fullName: fullName,
+                  email: email,
+                );
+
+                if (success && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Đăng ký thành công! Vui lòng đăng nhập.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  // Chuyển về tab login
+                  // (Cần pass callback từ parent để chuyển tab)
+                }
+              },
+              child: authProvider.isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      'Đăng ký',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
             ),
           ),
 

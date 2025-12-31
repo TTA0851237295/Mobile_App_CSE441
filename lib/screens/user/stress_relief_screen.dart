@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'Check_in.dart';
+import '../../providers/dashboard_provider.dart';
+import '../../providers/checkin_provider.dart';
 
 class StressReliefScreen extends StatefulWidget {
   const StressReliefScreen({super.key});
@@ -382,6 +385,13 @@ class _StressReliefScreenState extends State<StressReliefScreen> {
           setState(() {
             _showNotification = true;
           });
+          
+          // Refresh dashboard data
+          if (mounted) {
+            await context.read<DashboardProvider>().fetchStats();
+            await context.read<CheckinProvider>().fetchEmotionStats(7);
+            await context.read<CheckinProvider>().fetchCheckins();
+          }
         }
       },
       child: Container(

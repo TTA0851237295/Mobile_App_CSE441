@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/app_config.dart';
 
 class CheckIn {
   final String id;
@@ -24,11 +25,15 @@ class CheckIn {
   });
 
   factory CheckIn.fromJson(Map<String, dynamic> json) {
+    // Convert emotion enum from backend to Vietnamese
+    String emotionValue = json['emotion'] ?? '';
+    final vietnameseEmotion = AppConfig.enumToEmotion[emotionValue] ?? emotionValue;
+    
     return CheckIn(
-      id: json['id'] ?? '',
-      userId: json['user_id'] ?? '',
-      emotion: json['emotion'] ?? '',
-      timestamp: DateTime.parse(json['timestamp']),
+      id: (json['id'] ?? '').toString(),
+      userId: (json['userId'] ?? '').toString(),
+      emotion: vietnameseEmotion,
+      timestamp: DateTime.parse(json['createdAt'] ?? json['timestamp'] ?? DateTime.now().toIso8601String()),
       note: json['note'],
       tags: json['tags'] != null ? List<String>.from(json['tags']) : null,
       location: json['location'],
