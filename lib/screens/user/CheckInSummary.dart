@@ -241,7 +241,7 @@ class CheckInSummaryScreen extends StatelessWidget {
                         icon: const Icon(Icons.close, size: 20),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => Navigator.pop(context, true),
                       ),
                     ],
                   ),

@@ -1,72 +1,100 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 import '../models/check_in.dart';
+import '../config/app_config.dart';
 
-/// Provider để quản lý lịch sử check-in
-class CheckInProvider extends ChangeNotifier {
-  final List<CheckIn> _checkIns = [];
-  String? _latestAdvice;
+class CheckinProvider extends ChangeNotifier {
+  final ApiService _apiService = ApiService();
+  
+  List<CheckIn> _checkins = [];
+  Map<String, dynamic>? _emotionStats;
+  bool _isLoading = false;
+  String? _errorMessage;
 
-  List<CheckIn> get checkIns => List.unmodifiable(_checkIns);
-  String? get latestAdvice => _latestAdvice;
+  List<CheckIn> get checkins => _checkins;
+  Map<String, dynamic>? get emotionStats => _emotionStats;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
 
-  // Lưu lời khuyên mới nhất
-  void setLatestAdvice(String advice) {
-    _latestAdvice = advice;
+  // Tạo check-in mới
+  Future<bool> createCheckin({
+    required String emotion,
+    required String locationTag,
+    required String activityTag,
+    required String peopleTag,
+    String? note,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
-  }
 
-  // Lấy tất cả check-in trong ngày hôm nay
-  List<CheckIn> getTodayCheckIns() {
-    final now = DateTime.now();
-    final todayStart = DateTime(now.year, now.month, now.day);
-    final todayEnd = todayStart.add(const Duration(days: 1));
-
-    return _checkIns.where((checkIn) {
-      return checkIn.timestamp.isAfter(todayStart) &&
-          checkIn.timestamp.isBefore(todayEnd);
-    }).toList()
-      ..sort((a, b) => b.timestamp.compareTo(a.timestamp)); // Mới nhất lên đầu
-  }
-
-  // Thêm check-in mới
-  void addCheckIn(CheckIn checkIn) {
-    _checkIns.add(checkIn);
-    notifyListeners();
-  }
-
-  // Đếm số lượng check-in hôm nay
-  int getTodayCheckInCount() {
-    return getTodayCheckIns().length;
-  }
-
-  // Lấy cảm xúc trội nhất trong ngày (xuất hiện nhiều nhất)
-  String? getDominantEmotionToday() {
-    final todayCheckIns = getTodayCheckIns();
-    if (todayCheckIns.isEmpty) return null;
-
-    // Đếm số lần xuất hiện của mỗi cảm xúc
-    final emotionCount = <String, int>{};
-    for (var checkIn in todayCheckIns) {
-      emotionCount[checkIn.emotion] = (emotionCount[checkIn.emotion] ?? 0) + 1;
+    try {
+      // Map Vietnamese emotion to English enum
+      final emotionEnum = AppConfig.emotionToEnum[emotion] ?? 'NEUTRAL';
+      
+      final response = await _apiService.createCheckin(
+        emotion: emotionEnum,
+        locationTag: locationTag,
+        activityTag: activityTag,
+        peopleTag: peopleTag,
+        note: note,
+      );
+      
+      // Thêm check-in mới vào đầu list
+      _checkins.insert(0, CheckIn.fromJson(response));
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
-
-    // Tìm cảm xúc xuất hiện nhiều nhất
-    var maxCount = 0;
-    String? dominantEmotion;
-    emotionCount.forEach((emotion, count) {
-      if (count > maxCount) {
-        maxCount = count;
-        dominantEmotion = emotion;
-      }
-    });
-
-    return dominantEmotion;
   }
 
-  // Xóa tất cả check-in (dùng cho testing)
-  void clearAll() {
-    _checkIns.clear();
+  // Lấy danh sách check-ins
+  Future<void> fetchCheckins() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiService.getCheckins();
+      _checkins = response.map((json) => CheckIn.fromJson(json)).toList();
+      
+      print('DEBUG CHECKIN PROVIDER: Fetched ${_checkins.length} check-ins');
+      for (var checkin in _checkins.take(5)) {
+        print('  - ${checkin.timestamp}: ${checkin.emotion}');
+      }
+      if (_checkins.length > 5) {
+        print('  ... and ${_checkins.length - 5} more');
+      }
+      
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Lấy thống kê cảm xúc
+  Future<void> fetchEmotionStats(int days) async {
+    try {
+      _emotionStats = await _apiService.getEmotionStats(days);
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+    }
+  }
+
+  // Clear error
+  void clearError() {
+    _errorMessage = null;
     notifyListeners();
   }
 }
-

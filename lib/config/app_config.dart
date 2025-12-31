@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   // API Configuration
-  static const String apiBaseUrl = 'YOUR_API_URL_HERE';
+  // 10.0.2.2 cho Android Emulator
+  // localhost cho iOS Simulator/Web
+  // IP máy thật cho thiết bị thực (ví dụ: 192.168.1.x)
+  static const String apiBaseUrl = 'http://localhost:8080/api';
 
 
   // Emotions
@@ -13,6 +16,60 @@ class AppConfig {
     'Căng thẳng',
     'Giận dữ',
   ];
+
+  // Emotion mapping to backend enum
+  static const Map<String, String> emotionToEnum = {
+    'Hạnh phúc': 'HAPPY',
+    'Vui vẻ': 'JOY',
+    'Bình thường': 'NEUTRAL',
+    'Buồn': 'SAD',
+    'Căng thẳng': 'STRESSED',
+    'Giận dữ': 'ANGRY',
+    'Lo lắng': 'WORRIED',
+  };
+
+  // Reverse mapping from enum to Vietnamese
+  static const Map<String, String> enumToEmotion = {
+    'HAPPY': 'Hạnh phúc',
+    'JOY': 'Vui vẻ',
+    'NEUTRAL': 'Bình thường',
+    'SAD': 'Buồn',
+    'STRESSED': 'Căng thẳng',
+    'ANGRY': 'Giận dữ',
+    'WORRIED': 'Lo lắng',
+  };
+
+  // Location mapping to backend enum
+  static const Map<String, String> locationToEnum = {
+    'Công ty': 'WORK',
+    'Ở nhà': 'HOME',
+    'Đang di chuyển': 'COMMUTE',
+    'Ngoài trời': 'OUTDOOR',
+    'Khác': 'OTHER',
+  };
+
+  // Activity mapping to backend enum
+  static const Map<String, String> activityToEnum = {
+    'Họp': 'MEETING',
+    'Code': 'CODING',
+    'Học bài': 'STUDY',
+    'Lướt mạng': 'SOCIAL_MEDIA',
+    'Ăn uống': 'EATING',
+    'Tập thể dục': 'WORKOUT',
+    'Thư giãn': 'RELAX',
+    'Khác': 'OTHER',
+  };
+
+  // People mapping to backend enum
+  static const Map<String, String> peopleToEnum = {
+    'Một mình': 'ALONE',
+    'Đồng nghiệp': 'COWORKERS',
+    'Sếp': 'BOSS',
+    'Gia đình': 'FAMILY',
+    'Bạn bè': 'FRIENDS',
+    'Người yêu': 'PARTNER',
+    'Khác': 'OTHER',
+  };
 
   // Colors
   static const Color primaryColor = Color(0xFF9810FA);

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'custom_app_bar.dart';
 import 'custom_bottom_nav.dart';
 import 'more_shell.dart';
 import '../screens/user/insight.dart';
 import '../screens/user/dashboard_screen.dart';
 import '../screens/user/stress_relief_screen.dart';
+import '../providers/checkin_provider.dart';
+import '../providers/dashboard_provider.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -22,6 +25,16 @@ class _AppShellState extends State<AppShell> {
     InsightsScreen(),
     MoreShell(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch initial data when app starts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CheckinProvider>().fetchCheckins();
+      context.read<DashboardProvider>().fetchStats(days: 7); // Default 7 days
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
