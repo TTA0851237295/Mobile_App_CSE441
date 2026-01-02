@@ -582,7 +582,7 @@ class _SmartInsightCard extends StatelessWidget {
     final checkins = checkinProvider.checkins;
     
     if (checkins.isEmpty) {
-      return 'Bạn chưa có check-in nào. Hãy bắt đầu ghi lại cảm xúc của mình để nhận phân tích!';
+      return 'Bạn chưa có check-in nào. Hãy bắt đầu ghi lại cảm xúc của mình để nhận phân tích AI thông minh!';
     }
 
     // Lọc check-in trong 30 ngày qua
@@ -593,20 +593,22 @@ class _SmartInsightCard extends StatelessWidget {
     }).toList();
 
     if (last30Days.isEmpty) {
-      return 'Bạn chưa có check-in nào trong 30 ngày qua.';
+      return 'Bạn chưa có check-in nào trong 30 ngày qua. Hãy bắt đầu ghi lại cảm xúc!';
     }
 
     final totalCheckins = last30Days.length;
     
-    // Đếm số lượng từng cảm xúc
-    final positiveEmotions = ['HAPPY', 'JOYFUL'];
-    final negativeEmotions = ['ANXIOUS', 'STRESSED', 'SAD', 'ANGRY'];
+    // Emotions in Vietnamese (matching database)
+    final positiveEmotions = ['Vui vẻ', 'Hạnh phúc'];
+    final negativeEmotions = ['Lo lắng', 'Căng thẳng', 'Buồn bã', 'Giận dữ', 'Buồn'];
+    final neutralEmotions = ['Bình thường'];
     
     int positiveCount = 0;
     int negativeCount = 0;
     int neutralCount = 0;
     Map<String, int> emotionCounts = {};
     
+    // Count emotions
     for (var checkin in last30Days) {
       final emotion = checkin.emotion;
       emotionCounts[emotion] = (emotionCounts[emotion] ?? 0) + 1;
@@ -615,7 +617,7 @@ class _SmartInsightCard extends StatelessWidget {
         positiveCount++;
       } else if (negativeEmotions.contains(emotion)) {
         negativeCount++;
-      } else {
+      } else if (neutralEmotions.contains(emotion)) {
         neutralCount++;
       }
     }
@@ -626,7 +628,7 @@ class _SmartInsightCard extends StatelessWidget {
     final positivePercent = (positiveCount / total * 100).round();
     final negativePercent = (negativeCount / total * 100).round();
 
-    // Tìm cảm xúc phổ biến nhất
+    // Find most common emotion
     String topEmotion = '';
     int maxCount = 0;
     emotionCounts.forEach((emotion, count) {
@@ -636,45 +638,93 @@ class _SmartInsightCard extends StatelessWidget {
       }
     });
 
-    // Map emotion to Vietnamese
-    final emotionMap = {
-      'HAPPY': 'Vui vẻ',
-      'JOYFUL': 'Hạnh phúc',
-      'NORMAL': 'Bình thường',
-      'ANXIOUS': 'Lo lắng',
-      'STRESSED': 'Căng thẳng',
-      'SAD': 'Buồn bã',
-      'ANGRY': 'Giận dữ',
-    };
-    final topEmotionVi = emotionMap[topEmotion] ?? topEmotion;
-
-    // Tạo insights
+    // Build AI insights
     List<String> insights = [];
     
-    insights.add('📊 Bạn đã check-in $totalCheckins lần trong 30 ngày qua.');
+    // Basic stats
+    insights.add('📊 Trong 30 ngày qua, bạn đã check-in $totalCheckins lần.');
     
+    // Most frequent emotion
     if (topEmotion.isNotEmpty && maxCount > 0) {
-      insights.add('\n\n🎯 Cảm xúc "$topEmotionVi" xuất hiện nhiều nhất với $maxCount lần.');
+      final percentage = (maxCount / totalCheckins * 100).round();
+      insights.add(' Cảm xúc "$topEmotion" chiếm $percentage% ($maxCount lần).');
     }
 
+    // Emotional balance analysis
     if (positivePercent > 60) {
-      insights.add('\n\n✨ Tuyệt vời! $positivePercent% thời gian bạn có tâm trạng tích cực. Hãy tiếp tục duy trì nhé!');
+      insights.add('\n\n✨ Tuyệt vời! $positivePercent% thời gian bạn có tâm trạng tích cực.');
+      insights.add('\n\n🎯 Lời khuyên AI: Hãy tiếp tục duy trì những hoạt động và thói quen tích cực này. Viết nhật ký về những điều tốt đẹp mỗi ngày để củng cố cảm giác hạnh phúc.');
     } else if (negativePercent > 60) {
-      insights.add('\n\n💙 $negativePercent% thời gian bạn gặp cảm xúc tiêu cực. Hãy chăm sóc bản thân nhiều hơn. Thử các hoạt động thư giãn hoặc nói chuyện với người thân nhé!');
+      insights.add('\n\n💙 $negativePercent% thời gian bạn gặp cảm xúc tiêu cực.');
+      insights.add('\n\n🎯 Lời khuyên AI: Tâm An gợi ý bạn thử:');
+      insights.add('\n• Tập thở sâu 5-10 phút mỗi ngày');
+      insights.add('\n• Tập thể dục nhẹ nhàng (đi bộ, yoga)');
+      insights.add('\n• Nói chuyện với người thân hoặc bạn bè');
+      insights.add('\n• Giảm thời gian sử dụng mạng xã hội');
+      if (totalCheckins < 10) {
+        insights.add('\n\n💡 Hãy check-in thường xuyên hơn để AI có thể phân tích sâu hơn về nguyên nhân và đưa ra lời khuyên cụ thể hơn!');
+      }
     } else {
-      insights.add('\n\n⚖️ Cảm xúc của bạn khá cân bằng với $positivePercent% tích cực và $negativePercent% tiêu cực.');
+      insights.add('\n\n⚖️ Cảm xúc của bạn khá cân bằng: $positivePercent% tích cực, $negativePercent% tiêu cực.');
+      insights.add('\n\n🎯 Lời khuyên AI: Đây là trạng thái cân bằng tốt! Hãy duy trì sự ổn định này bằng cách:');
+      insights.add('\n• Giữ thói quen sinh hoạt đều đặn');
+      insights.add('\n• Dành thời gian cho sở thích cá nhân');
+      insights.add('\n• Kết nối với những người tích cực');
     }
 
-    // Phân tích xu hướng
+    // Trend analysis (7 days vs 30 days)
     if (last30Days.length >= 7) {
       final recentWeek = last30Days.take(7).toList();
       final recentPositive = recentWeek.where((c) => positiveEmotions.contains(c.emotion)).length;
       final recentNegative = recentWeek.where((c) => negativeEmotions.contains(c.emotion)).length;
+      final recentTotal = recentWeek.length;
       
-      if (recentPositive > recentNegative && positivePercent < 50) {
-        insights.add('\n\n📈 Tin tốt! Tâm trạng tuần gần đây đang có xu hướng tích cực hơn.');
-      } else if (recentNegative > recentPositive && negativePercent < 50) {
-        insights.add('\n\n📉 Tuần gần đây có vẻ khó khăn hơn. Hãy dành thời gian nghỉ ngơi và tự chăm sóc bản thân.');
+      if (recentTotal > 0) {
+        final recentPosPercent = (recentPositive / recentTotal * 100).round();
+        final recentNegPercent = (recentNegative / recentTotal * 100).round();
+        
+        if (recentPosPercent > positivePercent + 10) {
+          insights.add('\n\n📈 Xu hướng tích cực! Tuần gần đây bạn có $recentPosPercent% cảm xúc tích cực, cao hơn trung bình 30 ngày. Hãy tiếp tục nhé!');
+        } else if (recentNegPercent > negativePercent + 10) {
+          insights.add('\n\n📉 Tuần gần đây có vẻ khó khăn hơn ($recentNegPercent% tiêu cực). Hãy tự thưởng cho bản thân một hoạt động thư giãn yêu thích.');
+        }
+      }
+    }
+
+    // Activity & pattern suggestions (even with limited data)
+    if (totalCheckins >= 2) {
+      // Check if there are any tags
+      final hasActivity = last30Days.any((c) => c.activity != null && c.activity!.isNotEmpty);
+      final hasPeople = last30Days.any((c) => c.people != null && c.people!.isNotEmpty);
+      final hasLocation = last30Days.any((c) => c.location != null && c.location!.isNotEmpty);
+      
+      if (totalCheckins >= 2 && totalCheckins < 5) {
+        insights.add('\n\n🔍 AI đang học về bạn: Với $totalCheckins check-in, Tâm An đã bắt đầu hiểu cảm xúc của bạn.');
+        if (!hasActivity || !hasPeople || !hasLocation) {
+          insights.add(' Hãy thêm thông tin về hoạt động, người cùng và địa điểm để AI phân tích sâu hơn!');
+        } else {
+          insights.add(' Hãy tiếp tục check-in để nhận được phân tích chi tiết về mối liên hệ giữa cảm xúc và các yếu tố xung quanh.');
+        }
+      }
+      
+      // Simple pattern detection even with 2-3 checkins
+      if (totalCheckins >= 2 && totalCheckins <= 5) {
+        final morningCheckins = last30Days.where((c) => c.timestamp.hour >= 6 && c.timestamp.hour < 12).toList();
+        final eveningCheckins = last30Days.where((c) => c.timestamp.hour >= 18 && c.timestamp.hour < 24).toList();
+        
+        if (morningCheckins.length >= 2) {
+          final morningPositive = morningCheckins.where((c) => positiveEmotions.contains(c.emotion)).length;
+          if (morningPositive == morningCheckins.length) {
+            insights.add('\n\n🌅 AI nhận thấy: Bạn có xu hướng tích cực vào buổi sáng! Hãy tận dụng khoảng thời gian này cho các công việc quan trọng.');
+          }
+        }
+        
+        if (eveningCheckins.length >= 2) {
+          final eveningNegative = eveningCheckins.where((c) => negativeEmotions.contains(c.emotion)).length;
+          if (eveningNegative == eveningCheckins.length) {
+            insights.add('\n\n🌙 AI nhận thấy: Bạn có xu hướng tiêu cực vào buổi tối. Hãy thử thư giãn trước khi ngủ: đọc sách, nghe nhạc nhẹ, hoặc thiền.');
+          }
+        }
       }
     }
 
