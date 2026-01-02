@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/goal_provider.dart';
 
 class CreateGoalModal extends StatefulWidget {
   const CreateGoalModal({Key? key}) : super(key: key);
@@ -11,6 +13,7 @@ class _CreateGoalModalState extends State<CreateGoalModal> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _durationController = TextEditingController(text: '7');
+  bool _isLoading = false;
 
   String _selectedGoalType = 'Giảm căng thẳng';
 
@@ -365,32 +368,99 @@ class _CreateGoalModalState extends State<CreateGoalModal> {
 
   Widget _buildCreateButton() {
     return GestureDetector(
-      onTap: () {
-        // TODO: Implement create goal logic
-        Navigator.pop(context);
-      },
+      onTap: _isLoading ? null : _createGoal,
       child: Container(
         width: double.infinity,
         height: 36,
         decoration: BoxDecoration(
-          color: const Color(0xFF030213),
+          color: _isLoading ? Colors.grey : const Color(0xFF030213),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Center(
-          child: Text(
-            'Tạo mục tiêu',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontFamily: 'Arimo',
-              fontWeight: FontWeight.w400,
-              height: 1.43,
-            ),
-          ),
+        child: Center(
+          child: _isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text(
+                  'Tạo mục tiêu',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: 'Arimo',
+                    fontWeight: FontWeight.w400,
+                    height: 1.43,
+                  ),
+                ),
         ),
       ),
     );
+  }
+
+  Future<void> _createGoal() async {
+    final title = _titleController.text.trim();
+    final description = _descriptionController.text.trim();
+    final days = int.tryParse(_durationController.text) ?? 7;
+
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng nhập tiêu đề mục tiêu'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final startDate = DateTime.now();
+    final endDate = startDate.add(Duration(days: days));
+
+    final success = await context.read<GoalProvider>().createGoal(
+      title: title,
+      description: description.isNotEmpty ? description : _selectedGoalType,
+      startDate: startDate,
+      endDate: endDate,
+      targetCount: days, // Số ngày = số lần check-in mục tiêu
+    );
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      // Refresh lại danh sách goals
+      if (context.mounted) {
+        await context.read<GoalProvider>().fetchGoals();
+      }
+      if (!mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 8),
+              Expanded(child: Text('Đã tạo mục tiêu mới!')),
+            ],
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.read<GoalProvider>().errorMessage ?? 'Có lỗi xảy ra'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
 

@@ -305,7 +305,7 @@ class _LoginFormState extends State<_LoginForm> {
                 } else {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const AppShell()),
+                    MaterialPageRoute(builder: (_) => AppShell(key: appShellKey)),
                   );
                 }
               }
@@ -338,7 +338,7 @@ class _LoginFormState extends State<_LoginForm> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFE9D8FD)),
             ),
