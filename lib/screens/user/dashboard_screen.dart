@@ -599,12 +599,14 @@ class _EmotionStackedBarCard extends StatelessWidget {
         'Bình thường': 2, // NEUTRAL
         'Lo lắng': 3,     // WORRIED
         'Căng thẳng': 4,  // STRESSED
-        'Buồn bã': 5,     // SAD
+        'Buồn': 5,        // SAD - SỬA: từ 'Buồn bã' thành 'Buồn'
+        'Buồn bã': 5,     // SAD - backup
         'Giận dữ': 6,     // ANGRY
       };
       
-      // Tạo data cho 7 ngày với count của từng emotion
+      // Tạo data cho 7 ngày - mỗi cột LUÔN có tổng = 3, chia tỷ lệ theo emotion
       data = [];
+      
       for (int weekday = 1; weekday <= 7; weekday++) {
         final dayEmotions = List<double>.filled(7, 0.0);
         
@@ -612,26 +614,32 @@ class _EmotionStackedBarCard extends StatelessWidget {
         final dayCheckins = weekCheckins.where((c) => c.timestamp.weekday == weekday).toList();
         
         if (dayCheckins.isNotEmpty) {
-          // Count each emotion
-          final emotionCounts = <int, int>{};
+          // Count each emotion - số lượng thực tế
+          final emotionCounts = List<double>.filled(7, 0.0);
           for (var checkin in dayCheckins) {
             final emotionIndex = emotionToIndex[checkin.emotion] ?? 2;
-            emotionCounts[emotionIndex] = (emotionCounts[emotionIndex] ?? 0) + 1;
+            emotionCounts[emotionIndex] += 1.0;
           }
           
-          // Convert counts to normalized values (0-1 scale)
-          final maxCount = emotionCounts.values.fold(0, (max, count) => count > max ? count : max);
-          emotionCounts.forEach((index, count) {
-            dayEmotions[index] = count / (maxCount > 0 ? maxCount : 1);
-          });
+          // Tính tổng check-in trong ngày
+          final totalCheckinsInDay = dayCheckins.length.toDouble();
           
-          print('DEBUG: Weekday $weekday has ${dayCheckins.length} check-ins, emotions: $emotionCounts');
+          // Scale mỗi emotion theo tỷ lệ, tổng luôn = 3
+          for (int i = 0; i < emotionCounts.length; i++) {
+            if (emotionCounts[i] > 0) {
+              dayEmotions[i] = (emotionCounts[i] / totalCheckinsInDay) * 3.0;
+            }
+          }
+          
+          print('DEBUG: Weekday $weekday has ${dayCheckins.length} check-ins, scaled to 3: $dayEmotions');
         } else {
           print('DEBUG: Weekday $weekday has no check-ins');
         }
         
         data.add(dayEmotions);
       }
+      
+      print('DEBUG: Final normalized data (total=3 per day): $data');
       
       print('DEBUG: Final data: $data');
     } else {
@@ -747,6 +755,16 @@ class _StackedBarChartPainter extends CustomPainter {
     final chartWidth = size.width - leftMargin;
     final chartHeight = size.height - bottomMargin;
     
+    // Tìm giá trị MAX để scale biểu đồ
+    double maxTotal = 0;
+    for (var dayEmotions in data) {
+      final total = dayEmotions.fold(0.0, (sum, val) => sum + val);
+      if (total > maxTotal) maxTotal = total;
+    }
+    
+    // Nếu không có data, không vẽ gì
+    if (maxTotal == 0) return;
+    
     // Vẽ trục Y (bên trái)
     final axisPaint = Paint()
       ..color = const Color(0xFFD1D5DB)
@@ -765,13 +783,16 @@ class _StackedBarChartPainter extends CustomPainter {
       axisPaint,
     );
     
-    // Vẽ các mốc trục Y (0, 0.25, 0.5, 0.75, 1.0)
+    // Vẽ các mốc trục Y CỐ ĐỊNH từ 0 đến 3
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
     );
     
+    final yAxisMax = 3.0; // Cố định trục Y từ 0-3
+    final yAxisLabels = [0.0, 0.75, 1.5, 2.25, 3.0];
+    
     for (int i = 0; i <= 4; i++) {
-      final value = i * 0.25;
+      final value = yAxisLabels[i];
       final y = chartHeight - (i * 0.25 * chartHeight);
       
       // Vẽ vạch ngang
@@ -786,7 +807,7 @@ class _StackedBarChartPainter extends CustomPainter {
       
       // Vẽ số
       textPainter.text = TextSpan(
-        text: value.toStringAsFixed(1),
+        text: value % 1 == 0 ? value.toInt().toString() : value.toString(),
         style: const TextStyle(
           color: Color(0xFF6B7280),
           fontSize: 10,
@@ -812,17 +833,17 @@ class _StackedBarChartPainter extends CustomPainter {
       final dayEmotions = data[dayIdx];
       final x = leftMargin + (dayIdx * spacing) + (spacing - barWidth) / 2;
 
-      // Tính tổng giá trị để chuẩn hóa nếu > 1
+      // Tính tổng giá trị của ngày này
       final totalValue = dayEmotions.fold(0.0, (sum, val) => sum + val);
-      final scaleFactor = totalValue > 1.0 ? 1.0 / totalValue : 1.0;
+      if (totalValue == 0) continue;
 
       double accumulated = 0;
       for (int emotionIdx = 0; emotionIdx < dayEmotions.length; emotionIdx++) {
         final value = dayEmotions[emotionIdx];
         if (value <= 0) continue;
 
-        final normalizedValue = value * scaleFactor;
-        final segmentHeight = normalizedValue * maxHeight;
+        // Scale theo trục Y cố định 0-3
+        final segmentHeight = (value / yAxisMax) * maxHeight;
         final y = chartHeight - accumulated - segmentHeight;
         final rect = RRect.fromRectAndRadius(
           Rect.fromLTWH(x, y, barWidth, segmentHeight),
@@ -868,6 +889,8 @@ class _TopEmotionCard extends StatelessWidget {
       'Lo lắng': const Color(0xFF8B5CF6),
       'Căng thẳng': const Color(0xFFF97316),
       'Giận dữ': const Color(0xFFEF4444),
+      'Buồn': const Color(0xFF3B82F6),
+      'Buồn bã': const Color(0xFF3B82F6),
     };
 
     // Parse emotion counts from API

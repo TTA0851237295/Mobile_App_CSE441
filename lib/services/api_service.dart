@@ -93,11 +93,10 @@ class ApiService {
   }
 
   // Đăng ký
+  // Đăng ký
   Future<Map<String, dynamic>> register({
     required String username,
     required String password,
-    required String fullName,
-    required String email,
   }) async {
     final url = Uri.parse('${AppConfig.apiBaseUrl}/auth/register');
 
@@ -108,8 +107,6 @@ class ApiService {
         body: jsonEncode({
           'username': username,
           'password': password,
-          'fullName': fullName,
-          'email': email,
         }),
       ).timeout(const Duration(seconds: 15));
 

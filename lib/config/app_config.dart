@@ -1,39 +1,31 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 class AppConfig {
-  // ============ HƯỚNG DẪN CẤU HÌNH API URL ============
+  // ============ TỰ ĐỘNG PHÁT HIỆN MÔI TRƯỜNG ============
   //
-  // 1. Android Emulator: dùng 10.0.2.2 (trỏ tới localhost của máy host)
-  // 2. iOS Simulator: dùng localhost
-  // 3. Thiết bị thật (Android/iOS): dùng IP máy tính (vd: 192.168.1.100)
-  // 4. Web: dùng localhost
+  // App sẽ TỰ ĐỘNG chọn API URL phù hợp:
+  // - Web Browser       → http://localhost:8080/api
+  // - Android Emulator  → http://10.0.2.2:8080/api
+  // - Thiết bị thật     → http://[IP máy tính]:8080/api
+  // - iOS Simulator     → http://localhost:8080/api
   //
-  // QUAN TRỌNG: Backend Spring Boot phải đang chạy trên port 8080!
-  // =====================================================
-
-  // ĐỔI GIÁ TRỊ NÀY TÙY THEO MÔI TRƯỜNG TEST:
-  // - 'emulator'    : Test trên Android Emulator
-  // - 'device'      : Test trên thiết bị thật qua WiFi (cần đổi _deviceIP)
-  // - 'adb_reverse' : Test trên thiết bị thật qua USB (chạy: adb reverse tcp:8080 tcp:8080)
-  // - 'web'         : Test trên Web browser
-  static const String _environment = 'device';  // ĐANG TEST TRÊN ĐIỆN THOẠI THẬT QUA WIFI
-
-  // IP máy tính của bạn (dùng khi test trên thiết bị thật qua WiFi)
+  // CHỈ CẦN ĐỔI IP NÀY khi test trên điện thoại/tablet thật:
   // Chạy 'ipconfig' trong CMD để tìm IPv4 Address
-  static const String _deviceIP = '192.168.1.6';
+  // ======================================================
+  
+  static const String _deviceIP = '192.168.0.101';  // IP hiện tại của máy tính
 
   static String get apiBaseUrl {
-    switch (_environment) {
-      case 'device':
-        return 'http://$_deviceIP:8080/api';
-      case 'adb_reverse':
-        return 'http://localhost:8080/api';  // ADB reverse cho phép dùng localhost
-      case 'web':
-        return 'http://localhost:8080/api';
-      case 'emulator':
-      default:
-        return 'http://10.0.2.2:8080/api';
+    // Web browser → dùng localhost
+    if (kIsWeb) {
+      return 'http://localhost:8080/api';
     }
+    
+    // Mobile platforms → dùng IP của máy tính
+    // (Giả định đang test trên thiết bị thật qua WiFi)
+    // Nếu cần test emulator, đổi thành: 'http://10.0.2.2:8080/api'
+    return 'http://$_deviceIP:8080/api';
   }
 
 

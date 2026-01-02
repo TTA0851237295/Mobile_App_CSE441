@@ -384,16 +384,12 @@ class _RegisterFormState extends State<_RegisterForm> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
 
   @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _fullNameController.dispose();
-    _emailController.dispose();
     super.dispose();
   }
 
@@ -429,18 +425,6 @@ class _RegisterFormState extends State<_RegisterForm> {
               ),
             ),
 
-          const _Label(text: 'Họ và tên'),
-          const SizedBox(height: 8),
-          _InputField(controller: _fullNameController),
-
-          const SizedBox(height: 20),
-
-          const _Label(text: 'Email'),
-          const SizedBox(height: 8),
-          _InputField(controller: _emailController),
-
-          const SizedBox(height: 20),
-
           const _Label(text: 'Tên đăng nhập'),
           const SizedBox(height: 8),
           _InputField(controller: _usernameController),
@@ -473,10 +457,8 @@ class _RegisterFormState extends State<_RegisterForm> {
                 final username = _usernameController.text.trim();
                 final password = _passwordController.text.trim();
                 final confirmPassword = _confirmPasswordController.text.trim();
-                final fullName = _fullNameController.text.trim();
-                final email = _emailController.text.trim();
 
-                if (username.isEmpty || password.isEmpty || fullName.isEmpty || email.isEmpty) {
+                if (username.isEmpty || password.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin')),
                   );
@@ -494,8 +476,6 @@ class _RegisterFormState extends State<_RegisterForm> {
                 final success = await authProvider.register(
                   username: username,
                   password: password,
-                  fullName: fullName,
-                  email: email,
                 );
 
                 if (success && mounted) {
