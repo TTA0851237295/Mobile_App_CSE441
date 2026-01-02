@@ -29,6 +29,41 @@ class CheckIn {
     String emotionValue = json['emotion'] ?? '';
     final vietnameseEmotion = AppConfig.enumToEmotion[emotionValue] ?? emotionValue;
     
+    // Convert location/activity/people tags from backend enum to Vietnamese
+    String? locationTag = json['locationTag'] ?? json['location'];
+    String? activityTag = json['activityTag'] ?? json['activity'];
+    String? peopleTag = json['peopleTag'] ?? json['people'];
+
+    // Map enum to Vietnamese
+    final locationMap = {
+      'HOME': 'Ở nhà',
+      'WORK': 'Công ty',
+      'COMMUTE': 'Đang di chuyển',
+      'OUTDOOR': 'Ngoài trời',
+      'OTHER': 'Khác',
+    };
+
+    final activityMap = {
+      'MEETING': 'Họp',
+      'CODING': 'Code',
+      'STUDY': 'Học bài',
+      'SOCIAL_MEDIA': 'Lướt mạng',
+      'EATING': 'Ăn uống',
+      'WORKOUT': 'Tập thể dục',
+      'RELAX': 'Thư giãn',
+      'OTHER': 'Khác',
+    };
+
+    final peopleMap = {
+      'ALONE': 'Một mình',
+      'COWORKERS': 'Đồng nghiệp',
+      'BOSS': 'Sếp',
+      'FAMILY': 'Gia đình',
+      'FRIENDS': 'Bạn bè',
+      'PARTNER': 'Người yêu',
+      'OTHER': 'Khác',
+    };
+
     return CheckIn(
       id: (json['id'] ?? '').toString(),
       userId: (json['userId'] ?? '').toString(),
@@ -36,9 +71,9 @@ class CheckIn {
       timestamp: DateTime.parse(json['createdAt'] ?? json['timestamp'] ?? DateTime.now().toIso8601String()),
       note: json['note'],
       tags: json['tags'] != null ? List<String>.from(json['tags']) : null,
-      location: json['location'],
-      activity: json['activity'],
-      people: json['people'],
+      location: locationTag != null ? (locationMap[locationTag] ?? locationTag) : null,
+      activity: activityTag != null ? (activityMap[activityTag] ?? activityTag) : null,
+      people: peopleTag != null ? (peopleMap[peopleTag] ?? peopleTag) : null,
     );
   }
 

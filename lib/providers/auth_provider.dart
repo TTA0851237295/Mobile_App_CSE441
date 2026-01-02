@@ -101,15 +101,17 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> changePassword({
     required String currentPassword,
     required String newPassword,
+    required String confirmPassword,
   }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _apiService.changePassword(
+      await _apiService.changePasswordV2(
         currentPassword: currentPassword,
         newPassword: newPassword,
+        confirmPassword: confirmPassword,
       );
       
       _isLoading = false;
@@ -120,6 +122,43 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return false;
+    }
+  }
+
+  // Cập nhật theme mode
+  Future<bool> updateThemeMode(String themeMode) async {
+    try {
+      await _apiService.updateThemeMode(themeMode);
+      if (_currentUser != null) {
+        _currentUser = User(
+          id: _currentUser!.id,
+          username: _currentUser!.username,
+          fullName: _currentUser!.fullName,
+          displayName: _currentUser!.displayName,
+          email: _currentUser!.email,
+          role: _currentUser!.role,
+          isActive: _currentUser!.isActive,
+          themeMode: themeMode,
+          createdAt: _currentUser!.createdAt,
+        );
+        notifyListeners();
+      }
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Lấy thông tin user hiện tại từ /users/me
+  Future<void> getCurrentUserInfo() async {
+    try {
+      final response = await _apiService.getCurrentUser();
+      _currentUser = User.fromJson(response);
+      notifyListeners();
+    } catch (e) {
+      throw e;
     }
   }
 

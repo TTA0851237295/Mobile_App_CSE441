@@ -1,11 +1,40 @@
 import 'package:flutter/material.dart';
 
 class AppConfig {
-  // API Configuration
-  // 10.0.2.2 cho Android Emulator
-  // localhost cho iOS Simulator/Web
-  // IP máy thật cho thiết bị thực (ví dụ: 192.168.1.x)
-  static const String apiBaseUrl = 'http://localhost:8080/api';
+  // ============ HƯỚNG DẪN CẤU HÌNH API URL ============
+  //
+  // 1. Android Emulator: dùng 10.0.2.2 (trỏ tới localhost của máy host)
+  // 2. iOS Simulator: dùng localhost
+  // 3. Thiết bị thật (Android/iOS): dùng IP máy tính (vd: 192.168.1.100)
+  // 4. Web: dùng localhost
+  //
+  // QUAN TRỌNG: Backend Spring Boot phải đang chạy trên port 8080!
+  // =====================================================
+
+  // ĐỔI GIÁ TRỊ NÀY TÙY THEO MÔI TRƯỜNG TEST:
+  // - 'emulator'    : Test trên Android Emulator
+  // - 'device'      : Test trên thiết bị thật qua WiFi (cần đổi _deviceIP)
+  // - 'adb_reverse' : Test trên thiết bị thật qua USB (chạy: adb reverse tcp:8080 tcp:8080)
+  // - 'web'         : Test trên Web browser
+  static const String _environment = 'device';  // ĐANG TEST TRÊN ĐIỆN THOẠI THẬT QUA WIFI
+
+  // IP máy tính của bạn (dùng khi test trên thiết bị thật qua WiFi)
+  // Chạy 'ipconfig' trong CMD để tìm IPv4 Address
+  static const String _deviceIP = '192.168.1.6';
+
+  static String get apiBaseUrl {
+    switch (_environment) {
+      case 'device':
+        return 'http://$_deviceIP:8080/api';
+      case 'adb_reverse':
+        return 'http://localhost:8080/api';  // ADB reverse cho phép dùng localhost
+      case 'web':
+        return 'http://localhost:8080/api';
+      case 'emulator':
+      default:
+        return 'http://10.0.2.2:8080/api';
+    }
+  }
 
 
   // Emotions

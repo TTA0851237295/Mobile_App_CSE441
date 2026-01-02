@@ -166,7 +166,7 @@ class CheckInSummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final checkInProvider = Provider.of<CheckInProvider>(context);
+    final checkInProvider = Provider.of<CheckinProvider>(context);
     final todayCount = checkInProvider.getTodayCheckInCount();
     final personalizedAdvice = _getPersonalizedAdvice();
 

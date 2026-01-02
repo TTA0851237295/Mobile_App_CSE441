@@ -10,11 +10,39 @@ class CheckinProvider extends ChangeNotifier {
   Map<String, dynamic>? _emotionStats;
   bool _isLoading = false;
   String? _errorMessage;
+  String? _latestAdvice;
+
+  // Pagination
+  int _currentPage = 0;
+  int _totalPages = 1;
+  bool _hasMore = true;
 
   List<CheckIn> get checkins => _checkins;
   Map<String, dynamic>? get emotionStats => _emotionStats;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String? get latestAdvice => _latestAdvice;
+  bool get hasMore => _hasMore;
+
+  // Get today's check-ins
+  List<CheckIn> getTodayCheckIns() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return _checkins.where((checkin) {
+      return checkin.timestamp.isAfter(today);
+    }).toList();
+  }
+
+  // Get today's check-in count
+  int getTodayCheckInCount() {
+    return getTodayCheckIns().length;
+  }
+
+  // Set latest advice
+  void setLatestAdvice(String advice) {
+    _latestAdvice = advice;
+    notifyListeners();
+  }
 
   // Tạo check-in mới
   Future<bool> createCheckin({
@@ -58,6 +86,7 @@ class CheckinProvider extends ChangeNotifier {
   Future<void> fetchCheckins() async {
     _isLoading = true;
     _errorMessage = null;
+    _currentPage = 0;
     notifyListeners();
 
     try {
@@ -81,6 +110,49 @@ class CheckinProvider extends ChangeNotifier {
     }
   }
 
+  // Lấy thêm check-ins (infinite scroll)
+  Future<void> fetchMoreCheckins() async {
+    if (_isLoading || !_hasMore) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await _apiService.getCheckinsPaginated(page: _currentPage + 1, size: 20);
+      final content = response['content'] as List? ?? [];
+
+      if (content.isEmpty) {
+        _hasMore = false;
+      } else {
+        _currentPage++;
+        _checkins.addAll(content.map((json) => CheckIn.fromJson(json)).toList());
+        _totalPages = response['totalPages'] ?? 1;
+        _hasMore = _currentPage < _totalPages - 1;
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Xóa check-in
+  Future<bool> deleteCheckin(dynamic checkinId) async {
+    try {
+      await _apiService.deleteCheckin(checkinId);
+      _checkins.removeWhere((c) => c.id == checkinId);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Lấy thống kê cảm xúc
   Future<void> fetchEmotionStats(int days) async {
     try {
@@ -95,6 +167,19 @@ class CheckinProvider extends ChangeNotifier {
   // Clear error
   void clearError() {
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  // Clear tất cả checkins khi logout
+  void clearCheckins() {
+    _checkins = [];
+    _emotionStats = null;
+    _isLoading = false;
+    _errorMessage = null;
+    _latestAdvice = null;
+    _currentPage = 0;
+    _totalPages = 1;
+    _hasMore = true;
     notifyListeners();
   }
 }

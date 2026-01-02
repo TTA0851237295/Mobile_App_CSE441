@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/insight_provider.dart';
 import '../../providers/checkin_provider.dart';
+import '../../providers/theme_provider.dart';
 
 
 /// ===============================
@@ -46,122 +47,139 @@ class _InsightsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
+
     return Consumer<InsightProvider>(
       builder: (context, insightProvider, child) {
         final totalCheckins = insightProvider.totalCheckIns;
         final insights = insightProvider.insights;
         final isCalculating = insightProvider.isCalculating;
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ===== TIÊU ĐỀ =====
-              const Text(
-                'Phân tích AI',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF0F172A),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                totalCheckins > 0
-                    ? 'Tâm An đã phân tích $totalCheckins check-in trong 30 ngày qua'
-                    : 'Chưa có dữ liệu để phân tích',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF6B7280),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // ===== CARD LƯU Ý =====
-              _InfoNoteCard(),
-
-              const SizedBox(height: 16),
-
-              // ===== PHÂN TÍCH THÔNG MINH =====
-              _SmartInsightCard(),
-
-              const SizedBox(height: 16),
-
-              // ===== LOADING STATE =====
-              if (isCalculating)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: CircularProgressIndicator(),
+        return Container(
+          decoration: BoxDecoration(
+            gradient: isDarkMode
+                ? const LinearGradient(
+                    begin: Alignment(0.0, 0.0),
+                    end: Alignment(1.0, 1.0),
+                    colors: [
+                      Color(0xFF121218),
+                      Color(0xFF1E1E2E),
+                      Color(0xFF121218),
+                    ],
+                  )
+                : null,
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ===== TIÊU ĐỀ =====
+                Text(
+                  'Phân tích AI',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  totalCheckins > 0
+                      ? 'Tâm An đã phân tích $totalCheckins check-in trong 30 ngày qua'
+                      : 'Chưa có dữ liệu để phân tích',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                  ),
+                ),
+                const SizedBox(height: 16),
 
-              // ===== CÁC KHỐI TƯƠNG QUAN =====
-              if (!isCalculating && insights.isEmpty)
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      width: 1.25,
-                      color: const Color(0xFFE5E7EB),
+                // ===== CARD LƯU Ý =====
+                _InfoNoteCard(),
+
+                const SizedBox(height: 16),
+
+                // ===== PHÂN TÍCH THÔNG MINH =====
+                _SmartInsightCard(),
+
+                const SizedBox(height: 16),
+
+                // ===== LOADING STATE =====
+                if (isCalculating)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: CircularProgressIndicator(),
                     ),
                   ),
-                  child: const Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          '📊',
-                          style: TextStyle(fontSize: 48),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Chưa đủ dữ liệu để phân tích',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF111827),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Hãy check-in thường xuyên hơn để Tâm An có thể phân tích tốt hơn!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF6B7280),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
 
-              if (!isCalculating && insights.isNotEmpty)
-                ...insights.map((insight) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _CorrelationCard(
-                        emoji: insight.emoji,
-                        title: insight.title,
-                        reliabilityText: insight.reliabilityText,
-                        reliabilityColor: insight.reliabilityColor,
-                        reliabilityBorderColor: insight.reliabilityBorderColor,
-                        description: insight.description,
-                        chipLabel: insight.chipLabel,
+                // ===== CÁC KHỐI TƯƠNG QUAN =====
+                if (!isCalculating && insights.isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? const Color(0xFF1E1E2E) : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        width: 1.25,
+                        color: isDarkMode ? const Color(0xFF2D2D3D) : const Color(0xFFE5E7EB),
                       ),
-                    )),
+                    ),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Text(
+                            '📊',
+                            style: TextStyle(fontSize: 48),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Chưa đủ dữ liệu để phân tích',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: isDarkMode ? Colors.white : const Color(0xFF111827),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Hãy check-in thường xuyên hơn để Tâm An có thể phân tích tốt hơn!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
 
-              const SizedBox(height: 20),
+                if (!isCalculating && insights.isNotEmpty)
+                  ...insights.map((insight) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _CorrelationCard(
+                          emoji: insight.emoji,
+                          title: insight.title,
+                          reliabilityText: insight.reliabilityText,
+                          reliabilityColor: insight.reliabilityColor,
+                          reliabilityBorderColor: insight.reliabilityBorderColor,
+                          description: insight.description,
+                          chipLabel: insight.chipLabel,
+                        ),
+                      )),
 
-              // ===== MẸO PHÂN TÍCH TỐT HƠN =====
-              const _TipsCard(),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // ===== LỜI KHUYÊN SỨC KHỎE TINH THẦN =====
-              const _MentalHealthSection(),
-            ],
+                // ===== MẸO PHÂN TÍCH TỐT HƠN =====
+                const _TipsCard(),
+                const SizedBox(height: 20),
+
+                // ===== LỜI KHUYÊN SỨC KHỎE TINH THẦN =====
+                const _MentalHealthSection(),
+              ],
+            ),
           ),
         );
       },

@@ -4,7 +4,6 @@ import 'CheckInSummary.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../providers/checkin_provider.dart';
 import '../../config/app_config.dart';
-import '../../models/check_in.dart' as models;
 
 class CheckInDetailScreen extends StatefulWidget {
   final String selectedEmotion;
@@ -29,6 +28,10 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
   void initState() {
     super.initState();
     _selectedEmotion = widget.selectedEmotion;
+    // Fetch check-ins để cập nhật số check-in hôm nay
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CheckinProvider>().fetchCheckins();
+    });
   }
 
   @override
@@ -39,7 +42,7 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final checkInProvider = Provider.of<CheckInProvider>(context);
+    final checkInProvider = Provider.of<CheckinProvider>(context);
     final todayCount = checkInProvider.getTodayCheckInCount();
 
     return Scaffold(
@@ -494,57 +497,63 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
           borderRadius: BorderRadius.circular(14),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double itemWidth = (constraints.maxWidth - 12) / 2;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Bạn đang ở đâu?',
-                style: TextStyle(
-                  color: Color(0xFF0A0A0A),
-                  fontSize: 16,
-                  fontFamily: 'Arimo',
-                  fontWeight: FontWeight.w400,
-                  height: 1.50,
-                ),
+              Row(
+                children: [
+                  const Text(
+                    'Bạn đang ở đâu?',
+                    style: TextStyle(
+                      color: Color(0xFF0A0A0A),
+                      fontSize: 16,
+                      fontFamily: 'Arimo',
+                      fontWeight: FontWeight.w400,
+                      height: 1.50,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '(Tùy chọn)',
+                    style: TextStyle(
+                      color: Color(0xFF697282),
+                      fontSize: 14,
+                      fontFamily: 'Arimo',
+                      fontWeight: FontWeight.w400,
+                      height: 1.43,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              const Text(
-                '(Tùy chọn)',
-                style: TextStyle(
-                  color: Color(0xFF697282),
-                  fontSize: 14,
-                  fontFamily: 'Arimo',
-                  fontWeight: FontWeight.w400,
-                  height: 1.43,
-                ),
+              const SizedBox(height: 24),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _buildSelectableOptionLarge('🏢', 'Công ty', itemWidth, _selectedLocation, (value) {
+                    setState(() => _selectedLocation = _selectedLocation == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('🏠', 'Ở nhà', itemWidth, _selectedLocation, (value) {
+                    setState(() => _selectedLocation = _selectedLocation == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('🚗', 'Đang di chuyển', itemWidth, _selectedLocation, (value) {
+                    setState(() => _selectedLocation = _selectedLocation == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('🌳', 'Ngoài trời', itemWidth, _selectedLocation, (value) {
+                    setState(() => _selectedLocation = _selectedLocation == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('📍', 'Khác', itemWidth, _selectedLocation, (value) {
+                    setState(() => _selectedLocation = _selectedLocation == value ? null : value);
+                  }),
+                ],
               ),
             ],
-          ),
-          const SizedBox(height: 40),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildSelectableOption('🏢', 'Công ty', _selectedLocation, (value) {
-                setState(() => _selectedLocation = _selectedLocation == value ? null : value);
-              }),
-              _buildSelectableOption('🏠', 'Ở nhà', _selectedLocation, (value) {
-                setState(() => _selectedLocation = _selectedLocation == value ? null : value);
-              }),
-              _buildSelectableOption('🚗', 'Đang di chuyển', _selectedLocation, (value) {
-                setState(() => _selectedLocation = _selectedLocation == value ? null : value);
-              }),
-              _buildSelectableOption('🌳', 'Ngoài trời', _selectedLocation, (value) {
-                setState(() => _selectedLocation = _selectedLocation == value ? null : value);
-              }),
-              _buildSelectableOption('📍', 'Khác', _selectedLocation, (value) {
-                setState(() => _selectedLocation = _selectedLocation == value ? null : value);
-              }),
-            ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -563,66 +572,72 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
           borderRadius: BorderRadius.circular(14),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double itemWidth = (constraints.maxWidth - 12) / 2;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Bạn đang làm gì?',
-                style: TextStyle(
-                  color: Color(0xFF0A0A0A),
-                  fontSize: 16,
-                  fontFamily: 'Arimo',
-                  fontWeight: FontWeight.w400,
-                  height: 1.50,
-                ),
+              Row(
+                children: [
+                  const Text(
+                    'Bạn đang làm gì?',
+                    style: TextStyle(
+                      color: Color(0xFF0A0A0A),
+                      fontSize: 16,
+                      fontFamily: 'Arimo',
+                      fontWeight: FontWeight.w400,
+                      height: 1.50,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '(Tùy chọn)',
+                    style: TextStyle(
+                      color: Color(0xFF697282),
+                      fontSize: 14,
+                      fontFamily: 'Arimo',
+                      fontWeight: FontWeight.w400,
+                      height: 1.43,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              const Text(
-                '(Tùy chọn)',
-                style: TextStyle(
-                  color: Color(0xFF697282),
-                  fontSize: 14,
-                  fontFamily: 'Arimo',
-                  fontWeight: FontWeight.w400,
-                  height: 1.43,
-                ),
+              const SizedBox(height: 24),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _buildSelectableOptionLarge('💼', 'Họp', itemWidth, _selectedActivity, (value) {
+                    setState(() => _selectedActivity = _selectedActivity == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('💻', 'Code', itemWidth, _selectedActivity, (value) {
+                    setState(() => _selectedActivity = _selectedActivity == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('📚', 'Học bài', itemWidth, _selectedActivity, (value) {
+                    setState(() => _selectedActivity = _selectedActivity == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('📱', 'Lướt mạng', itemWidth, _selectedActivity, (value) {
+                    setState(() => _selectedActivity = _selectedActivity == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('🍽️', 'Ăn uống', itemWidth, _selectedActivity, (value) {
+                    setState(() => _selectedActivity = _selectedActivity == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('🏃', 'Tập thể dục', itemWidth, _selectedActivity, (value) {
+                    setState(() => _selectedActivity = _selectedActivity == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('🧘', 'Thư giãn', itemWidth, _selectedActivity, (value) {
+                    setState(() => _selectedActivity = _selectedActivity == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('✨', 'Khác', itemWidth, _selectedActivity, (value) {
+                    setState(() => _selectedActivity = _selectedActivity == value ? null : value);
+                  }),
+                ],
               ),
             ],
-          ),
-          const SizedBox(height: 40),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildSelectableOption('💼', 'Họp', _selectedActivity, (value) {
-                setState(() => _selectedActivity = _selectedActivity == value ? null : value);
-              }),
-              _buildSelectableOption('💻', 'Code', _selectedActivity, (value) {
-                setState(() => _selectedActivity = _selectedActivity == value ? null : value);
-              }),
-              _buildSelectableOption('📚', 'Học bài', _selectedActivity, (value) {
-                setState(() => _selectedActivity = _selectedActivity == value ? null : value);
-              }),
-              _buildSelectableOption('📱', 'Lướt mạng', _selectedActivity, (value) {
-                setState(() => _selectedActivity = _selectedActivity == value ? null : value);
-              }),
-              _buildSelectableOption('🍽️', 'Ăn uống', _selectedActivity, (value) {
-                setState(() => _selectedActivity = _selectedActivity == value ? null : value);
-              }),
-              _buildSelectableOption('🏃', 'Tập thể dục', _selectedActivity, (value) {
-                setState(() => _selectedActivity = _selectedActivity == value ? null : value);
-              }),
-              _buildSelectableOption('🧘', 'Thư giãn', _selectedActivity, (value) {
-                setState(() => _selectedActivity = _selectedActivity == value ? null : value);
-              }),
-              _buildSelectableOption('✨', 'Khác', _selectedActivity, (value) {
-                setState(() => _selectedActivity = _selectedActivity == value ? null : value);
-              }),
-            ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -641,63 +656,69 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
           borderRadius: BorderRadius.circular(14),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double itemWidth = (constraints.maxWidth - 12) / 2;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Bạn đang với ai?',
-                style: TextStyle(
-                  color: Color(0xFF0A0A0A),
-                  fontSize: 16,
-                  fontFamily: 'Arimo',
-                  fontWeight: FontWeight.w400,
-                  height: 1.50,
-                ),
+              Row(
+                children: [
+                  const Text(
+                    'Bạn đang với ai?',
+                    style: TextStyle(
+                      color: Color(0xFF0A0A0A),
+                      fontSize: 16,
+                      fontFamily: 'Arimo',
+                      fontWeight: FontWeight.w400,
+                      height: 1.50,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '(Tùy chọn)',
+                    style: TextStyle(
+                      color: Color(0xFF697282),
+                      fontSize: 14,
+                      fontFamily: 'Arimo',
+                      fontWeight: FontWeight.w400,
+                      height: 1.43,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              const Text(
-                '(Tùy chọn)',
-                style: TextStyle(
-                  color: Color(0xFF697282),
-                  fontSize: 14,
-                  fontFamily: 'Arimo',
-                  fontWeight: FontWeight.w400,
-                  height: 1.43,
-                ),
+              const SizedBox(height: 24),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _buildSelectableOptionLarge('🧑', 'Một mình', itemWidth, _selectedCompany, (value) {
+                    setState(() => _selectedCompany = _selectedCompany == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('👔', 'Đồng nghiệp', itemWidth, _selectedCompany, (value) {
+                    setState(() => _selectedCompany = _selectedCompany == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('👨‍💼', 'Sếp', itemWidth, _selectedCompany, (value) {
+                    setState(() => _selectedCompany = _selectedCompany == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('👨‍👩‍👧‍👦', 'Gia đình', itemWidth, _selectedCompany, (value) {
+                    setState(() => _selectedCompany = _selectedCompany == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('👯', 'Bạn bè', itemWidth, _selectedCompany, (value) {
+                    setState(() => _selectedCompany = _selectedCompany == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('💑', 'Người yêu', itemWidth, _selectedCompany, (value) {
+                    setState(() => _selectedCompany = _selectedCompany == value ? null : value);
+                  }),
+                  _buildSelectableOptionLarge('👥', 'Khác', itemWidth, _selectedCompany, (value) {
+                    setState(() => _selectedCompany = _selectedCompany == value ? null : value);
+                  }),
+                ],
               ),
             ],
-          ),
-          const SizedBox(height: 40),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildSelectableOption('🧑', 'Một mình', _selectedCompany, (value) {
-                setState(() => _selectedCompany = _selectedCompany == value ? null : value);
-              }),
-              _buildSelectableOption('👔', 'Đồng nghiệp', _selectedCompany, (value) {
-                setState(() => _selectedCompany = _selectedCompany == value ? null : value);
-              }),
-              _buildSelectableOption('👨‍💼', 'Sếp', _selectedCompany, (value) {
-                setState(() => _selectedCompany = _selectedCompany == value ? null : value);
-              }),
-              _buildSelectableOption('👨‍👩‍👧‍👦', 'Gia đình', _selectedCompany, (value) {
-                setState(() => _selectedCompany = _selectedCompany == value ? null : value);
-              }),
-              _buildSelectableOption('👯', 'Bạn bè', _selectedCompany, (value) {
-                setState(() => _selectedCompany = _selectedCompany == value ? null : value);
-              }),
-              _buildSelectableOption('💑', 'Người yêu', _selectedCompany, (value) {
-                setState(() => _selectedCompany = _selectedCompany == value ? null : value);
-              }),
-              _buildSelectableOption('👥', 'Khác', _selectedCompany, (value) {
-                setState(() => _selectedCompany = _selectedCompany == value ? null : value);
-              }),
-            ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -717,7 +738,7 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
         splashColor: Colors.black.withValues(alpha: 0.1),
         highlightColor: Colors.black.withValues(alpha: 0.05),
         child: Container(
-          width: 102,
+          width: 100,
           height: 77,
           decoration: ShapeDecoration(
             color: isSelected ? const Color(0xFFE9D4FF) : Colors.white,
@@ -746,19 +767,74 @@ class _CheckInDetailScreenState extends State<CheckInDetailScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: isSelected ? const Color(0xFF980FFA) : const Color(0xFF0A0A0A),
-                  fontSize: 12,
-                  fontFamily: 'Arimo',
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  height: 1.33,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: isSelected ? const Color(0xFF980FFA) : const Color(0xFF0A0A0A),
+                    fontSize: 12,
+                    fontFamily: 'Arimo',
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    height: 1.33,
+                  ),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Widget button lớn giống như màn hình chọn cảm xúc
+  Widget _buildSelectableOptionLarge(
+      String emoji,
+      String label,
+      double width,
+      String? selectedValue,
+      Function(String) onSelect) {
+    final isSelected = selectedValue == label;
+
+    return GestureDetector(
+      onTap: () => onSelect(label),
+      child: Container(
+        width: width,
+        height: 100,
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFE9D4FF) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF980FFA)
+                : Colors.grey.withValues(alpha: 0.3),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              emoji,
+              style: const TextStyle(fontSize: 32),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: TextStyle(
+                color: isSelected ? const Color(0xFF980FFA) : const Color(0xFF0A0A0A),
+                fontSize: 14,
+                fontFamily: 'Arimo',
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+          ],
         ),
       ),
     );

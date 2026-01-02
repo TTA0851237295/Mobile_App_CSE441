@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'app_bar_admin.dart';
 import 'bottom_nav_admin.dart';
 import '../screens/admin/admin_home.dart';
 import '../screens/admin/admin_settings.dart';
 import '../screens/admin/admin_setting_screen.dart';
+import '../providers/theme_provider.dart';
 
 
 // nếu chưa có, có thể để tạm Container()
@@ -20,6 +22,8 @@ class _AppShellAdminState extends State<AppShellAdmin> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
+
     /// ⭐⭐ TẠO DANH SÁCH PAGES NGAY TRONG BUILD() ⭐⭐
     final List<Widget> _pages = [
   AdminDashboardBody(),
@@ -43,6 +47,7 @@ class _AppShellAdminState extends State<AppShellAdmin> {
   ),
 ];
     return Scaffold(
+      backgroundColor: isDarkMode ? const Color(0xFF121218) : const Color(0xFFF8F3FF),
       appBar: const AppBarAdmin(),
 
       body: IndexedStack(

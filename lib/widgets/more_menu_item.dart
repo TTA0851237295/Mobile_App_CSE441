@@ -7,6 +7,7 @@ class MoreMenuItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final bool isDarkMode;
 
   const MoreMenuItem({
     Key? key,
@@ -15,6 +16,7 @@ class MoreMenuItem extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.isDarkMode = false,
   }) : super(key: key);
 
   @override
@@ -24,10 +26,10 @@ class MoreMenuItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF1E1E2E) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0x1A000000),
+            color: isDarkMode ? const Color(0xFF2D2D3D) : const Color(0x1A000000),
             width: 1,
           ),
         ),
@@ -55,20 +57,20 @@ class MoreMenuItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: AppConfig.textPrimary,
+                      color: isDarkMode ? Colors.white : AppConfig.textPrimary,
                       height: 1.5,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      color: AppConfig.textSecondary,
+                      color: isDarkMode ? const Color(0xFF9CA3AF) : AppConfig.textSecondary,
                       height: 1.43,
                     ),
                   ),
@@ -78,10 +80,10 @@ class MoreMenuItem extends StatelessWidget {
 
             // Arrow Icon
             const SizedBox(width: 12),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 20,
-              color: Color(0xFF99A1AF),
+              color: isDarkMode ? const Color(0xFF6B7280) : const Color(0xFF99A1AF),
             ),
           ],
         ),

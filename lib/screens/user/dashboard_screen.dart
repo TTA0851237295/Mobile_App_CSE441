@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import '../../providers/dashboard_provider.dart';
 import '../../providers/checkin_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../config/app_config.dart';
 
 /// Màn hình chính – tab "Thống kê"
@@ -44,6 +45,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
+
     return Consumer2<DashboardProvider, CheckinProvider>(
       builder: (context, dashboardProvider, checkinProvider, child) {
         if (dashboardProvider.isLoading) {
@@ -51,16 +54,26 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         }
 
         return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment(0.0, 0.0),
-              end: Alignment(1.0, 1.0),
-              colors: [
-                Color(0xFFEEF5FE),
-                Color(0xFFFAF5FE),
-                Color(0xFFFCF1F7),
-              ],
-            ),
+          decoration: BoxDecoration(
+            gradient: isDarkMode
+                ? const LinearGradient(
+                    begin: Alignment(0.0, 0.0),
+                    end: Alignment(1.0, 1.0),
+                    colors: [
+                      Color(0xFF121218),
+                      Color(0xFF1E1E2E),
+                      Color(0xFF121218),
+                    ],
+                  )
+                : const LinearGradient(
+                    begin: Alignment(0.0, 0.0),
+                    end: Alignment(1.0, 1.0),
+                    colors: [
+                      Color(0xFFEEF5FE),
+                      Color(0xFFFAF5FE),
+                      Color(0xFFFCF1F7),
+                    ],
+                  ),
           ),
           child: RefreshIndicator(
             onRefresh: () async {
@@ -71,7 +84,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _StatsTitleSection(),
+                  _StatsTitleSection(isDarkMode: isDarkMode),
                   const SizedBox(height: 16),
                   _FilterRow(
                     selectedFilter: _selectedFilter,
@@ -81,16 +94,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       });
                       _loadData();
                     },
+                    isDarkMode: isDarkMode,
                   ),
                   const SizedBox(height: 16),
                   _SummaryRow(
                     selectedFilter: _selectedFilter,
                     dashboardProvider: dashboardProvider,
+                    isDarkMode: isDarkMode,
                   ),
                   const SizedBox(height: 16),
                   EmotionDistributionCard(
                     selectedFilter: _selectedFilter,
                     emotionCounts: dashboardProvider.emotionCounts,
+                    isDarkMode: isDarkMode,
                   ),
                   // Chỉ hiển thị biểu đồ cột cho filter "7 ngày"
                   if (_selectedFilter == '7 ngày') ...[
@@ -98,12 +114,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     _EmotionStackedBarCard(
                       selectedFilter: _selectedFilter,
                       checkinProvider: checkinProvider,
+                      isDarkMode: isDarkMode,
                     ),
                   ],
                   const SizedBox(height: 16),
                   _TopEmotionCard(
                     selectedFilter: _selectedFilter,
                     emotionCounts: dashboardProvider.emotionCounts,
+                    isDarkMode: isDarkMode,
                   ),
                 ],
               ),
@@ -116,25 +134,30 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 }
 
 class _StatsTitleSection extends StatelessWidget {
-  const _StatsTitleSection();
+  final bool isDarkMode;
+
+  const _StatsTitleSection({this.isDarkMode = false});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
           'Thống kê Cảm xúc',
           style: TextStyle(
-            color: Color(0xFF0F172A),
+            color: isDarkMode ? Colors.white : const Color(0xFF0F172A),
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           'Tổng quan về tâm trạng của bạn',
-          style: TextStyle(color: Color(0xFF6B7280), fontSize: 14),
+          style: TextStyle(
+            color: isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+            fontSize: 14,
+          ),
         ),
       ],
     );
@@ -145,10 +168,12 @@ class _StatsTitleSection extends StatelessWidget {
 class _FilterRow extends StatelessWidget {
   final String selectedFilter;
   final Function(String) onFilterChanged;
+  final bool isDarkMode;
 
   const _FilterRow({
     required this.selectedFilter,
     required this.onFilterChanged,
+    this.isDarkMode = false,
   });
 
   @override
@@ -159,18 +184,21 @@ class _FilterRow extends StatelessWidget {
           label: '7 ngày',
           selected: selectedFilter == '7 ngày',
           onTap: () => onFilterChanged('7 ngày'),
+          isDarkMode: isDarkMode,
         ),
         const SizedBox(width: 8),
         _FilterChip(
           label: '30 ngày',
           selected: selectedFilter == '30 ngày',
           onTap: () => onFilterChanged('30 ngày'),
+          isDarkMode: isDarkMode,
         ),
         const SizedBox(width: 8),
         _FilterChip(
           label: 'Tất cả',
           selected: selectedFilter == 'Tất cả',
           onTap: () => onFilterChanged('Tất cả'),
+          isDarkMode: isDarkMode,
         ),
       ],
     );
@@ -181,17 +209,23 @@ class _FilterChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final bool isDarkMode;
 
   const _FilterChip({
     required this.label,
     this.selected = false,
     required this.onTap,
+    this.isDarkMode = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bg = selected ? const Color(0xFF020617) : Colors.white;
-    final fg = selected ? Colors.white : const Color(0xFF0F172A);
+    final bg = selected
+        ? const Color(0xFF020617)
+        : (isDarkMode ? const Color(0xFF2D2D3D) : Colors.white);
+    final fg = selected
+        ? Colors.white
+        : (isDarkMode ? Colors.white : const Color(0xFF0F172A));
 
     return GestureDetector(
       onTap: onTap,
@@ -215,10 +249,12 @@ class _FilterChip extends StatelessWidget {
 class _SummaryRow extends StatelessWidget {
   final String selectedFilter;
   final DashboardProvider dashboardProvider;
+  final bool isDarkMode;
 
   const _SummaryRow({
     required this.selectedFilter,
     required this.dashboardProvider,
+    this.isDarkMode = false,
   });
 
   @override
@@ -236,6 +272,7 @@ class _SummaryRow extends StatelessWidget {
             iconBg: const Color(0xFFF5E9FF),
             title: 'Tổng check-in',
             value: totalCheckIn,
+            isDarkMode: isDarkMode,
           ),
         ),
         const SizedBox(width: 12),
@@ -245,6 +282,7 @@ class _SummaryRow extends StatelessWidget {
             iconBg: const Color(0xFFE5FBEE),
             title: 'Trung bình/ngày',
             value: avgPerDay,
+            isDarkMode: isDarkMode,
           ),
         ),
       ],
@@ -257,17 +295,28 @@ class _SummaryCard extends StatelessWidget {
   final Color iconBg;
   final String title;
   final String value;
+  final bool isDarkMode;
 
   const _SummaryCard({
     required this.icon,
     required this.iconBg,
     required this.title,
     required this.value,
+    this.isDarkMode = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return _card(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? const Color(0xFF1E1E2E) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDarkMode ? const Color(0xFF2D2D3D) : Colors.black.withOpacity(0.08),
+          width: 1.25,
+        ),
+      ),
       child: Row(
         children: [
           Container(
@@ -286,16 +335,16 @@ class _SummaryCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                  style: TextStyle(
+                    color: isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                     fontSize: 13,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(
-                    color: Color(0xFF0F172A),
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : const Color(0xFF0F172A),
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
@@ -316,21 +365,24 @@ class _SummaryCard extends StatelessWidget {
 class EmotionDistributionCard extends StatelessWidget {
   final String selectedFilter;
   final Map<String, int> emotionCounts;
+  final bool isDarkMode;
 
   const EmotionDistributionCard({
     super.key,
     required this.selectedFilter,
     required this.emotionCounts,
+    this.isDarkMode = false,
   });
 
   @override
   Widget build(BuildContext context) {
     if (emotionCounts.isEmpty) {
-      return _card(
-        child: const Center(
+      return _cardWithDarkMode(
+        isDarkMode: isDarkMode,
+        child: Center(
           child: Padding(
-            padding: EdgeInsets.all(32.0),
-            child: Text('Chưa có dữ liệu'),
+            padding: const EdgeInsets.all(32.0),
+            child: Text('Chưa có dữ liệu', style: TextStyle(color: isDarkMode ? const Color(0xFF9CA3AF) : null)),
           ),
         ),
       );
@@ -383,26 +435,28 @@ class EmotionDistributionCard extends StatelessWidget {
     }
 
     if (labels.isEmpty) {
-      return _card(
-        child: const Center(
+      return _cardWithDarkMode(
+        isDarkMode: isDarkMode,
+        child: Center(
           child: Padding(
-            padding: EdgeInsets.all(32.0),
-            child: Text('Chưa có dữ liệu'),
+            padding: const EdgeInsets.all(32.0),
+            child: Text('Chưa có dữ liệu', style: TextStyle(color: isDarkMode ? const Color(0xFF9CA3AF) : null)),
           ),
         ),
       );
     }
 
-    return _card(
+    return _cardWithDarkMode(
+      isDarkMode: isDarkMode,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Phân bố Cảm xúc",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0F172A),
+              color: isDarkMode ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           const SizedBox(height: 16),
@@ -450,9 +504,9 @@ class EmotionDistributionCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '${item.label}: ${item.value}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF374151),
+                        color: isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF374151),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -481,10 +535,12 @@ class _LegendItem {
 class _EmotionStackedBarCard extends StatelessWidget {
   final String selectedFilter;
   final CheckinProvider checkinProvider;
+  final bool isDarkMode;
 
   const _EmotionStackedBarCard({
     required this.selectedFilter,
     required this.checkinProvider,
+    this.isDarkMode = false,
   });
 
   @override
@@ -510,7 +566,6 @@ class _EmotionStackedBarCard extends StatelessWidget {
       'Giận dữ',
     ];
 
-    const emotionOrder = ['JOY', 'HAPPY', 'NEUTRAL', 'WORRIED', 'STRESSED', 'SAD', 'ANGRY'];
 
     List<String> days;
     List<List<double>> data;
@@ -523,8 +578,7 @@ class _EmotionStackedBarCard extends StatelessWidget {
       // Tính ngày đầu tuần (T2) và cuối tuần (CN)
       final now = DateTime.now();
       final currentWeekday = now.weekday; // 1=Monday, 7=Sunday
-      final monday = now.subtract(Duration(days: currentWeekday - 1));
-      
+
       // Lấy tất cả check-ins trong 7 ngày qua
       final allCheckins = checkinProvider.checkins;
       final startOfWeek = now.subtract(Duration(days: currentWeekday - 1)); // Monday
@@ -789,158 +843,6 @@ class _StackedBarChartPainter extends CustomPainter {
   }
 }
 
-/// Biểu đồ cột hiển thị cảm xúc theo thống kê
-class _EmotionTrendsCard extends StatelessWidget {
-  final String selectedFilter;
-  final Map<String, int> emotionCounts;
-
-  const _EmotionTrendsCard({
-    required this.selectedFilter,
-    required this.emotionCounts,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (emotionCounts.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    final colors = {
-      'Vui vẻ': const Color(0xFF22C55E),
-      'Hạnh phúc': const Color(0xFFEAB308),
-      'Bình thường': const Color(0xFF6B7280),
-      'Lo lắng': const Color(0xFF8B5CF6),
-      'Căng thẳng': const Color(0xFFF97316),
-      'Giận dữ': const Color(0xFFEF4444),
-      'Buồn': const Color(0xFF3B82F6),
-    };
-
-    // Convert emotionCounts to bar chart data
-    final List<BarChartGroupData> barGroups = [];
-    final emotionLabels = <String>[];
-    int index = 0;
-    
-    emotionCounts.forEach((emotionEnum, count) {
-      if (count > 0) {
-        final emotion = AppConfig.enumToEmotion[emotionEnum] ?? emotionEnum;
-        final color = colors[emotion] ?? const Color(0xFF6B7280);
-        emotionLabels.add(emotion);
-        
-        barGroups.add(
-          BarChartGroupData(
-            x: index,
-            barRods: [
-              BarChartRodData(
-                toY: count.toDouble(),
-                color: color,
-                width: 32,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-              ),
-            ],
-          ),
-        );
-        index++;
-      }
-    });
-
-    if (barGroups.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    final maxY = emotionCounts.values.reduce((a, b) => a > b ? a : b).toDouble();
-
-    return _card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Thống kê Cảm xúc',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF0F172A),
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 220,
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceEvenly,
-                maxY: maxY + 2,
-                barTouchData: BarTouchData(
-                  enabled: true,
-                  touchTooltipData: BarTouchTooltipData(
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      return BarTooltipItem(
-                        '${emotionLabels[groupIndex]}\n${rod.toY.toInt()} lần',
-                        const TextStyle(color: Colors.white, fontSize: 12),
-                      );
-                    },
-                  ),
-                ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= 0 && value.toInt() < emotionLabels.length) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              emotionLabels[value.toInt()],
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF6B7280),
-                              ),
-                            ),
-                          );
-                        }
-                        return const Text('');
-                      },
-                    ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 32,
-                      interval: maxY > 10 ? (maxY / 5).ceilToDouble() : 1,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          value.toInt().toString(),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF6B7280),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: maxY > 10 ? (maxY / 5).ceilToDouble() : 1,
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: const Color(0xFFE5E7EB),
-                      strokeWidth: 1,
-                    );
-                  },
-                ),
-                borderData: FlBorderData(show: false),
-                barGroups: barGroups,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 //
 //  CẢM XÚC PHỔ BIẾN NHẤT
@@ -949,10 +851,12 @@ class _EmotionTrendsCard extends StatelessWidget {
 class _TopEmotionCard extends StatelessWidget {
   final String selectedFilter;
   final Map<String, int> emotionCounts;
+  final bool isDarkMode;
 
   const _TopEmotionCard({
     required this.selectedFilter,
     required this.emotionCounts,
+    this.isDarkMode = false,
   });
 
   @override
@@ -1110,6 +1014,23 @@ Widget _card({required Widget child}) {
       color: Colors.white,
       borderRadius: BorderRadius.circular(16),
       border: Border.all(color: Colors.black.withValues(alpha: 0.06), width: 1),
+    ),
+    child: child,
+  );
+}
+
+/// Helper: card hỗ trợ dark mode
+Widget _cardWithDarkMode({required Widget child, bool isDarkMode = false}) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: isDarkMode ? const Color(0xFF1E1E2E) : Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(
+        color: isDarkMode ? const Color(0xFF2D2D3D) : Colors.black.withValues(alpha: 0.06),
+        width: 1,
+      ),
     ),
     child: child,
   );

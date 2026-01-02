@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'Check_in.dart';
 import '../../providers/dashboard_provider.dart';
 import '../../providers/checkin_provider.dart';
+import '../../providers/theme_provider.dart';
 
 class StressReliefScreen extends StatefulWidget {
   const StressReliefScreen({super.key});
@@ -16,8 +17,10 @@ class _StressReliefScreenState extends State<StressReliefScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final checkInProvider = Provider.of<CheckInProvider>(context);
+    final checkInProvider = Provider.of<CheckinProvider>(context);
+    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
     final latestAdvice = checkInProvider.latestAdvice ?? 'Hãy thử kỹ thuật hít thở 4-7-8 để giảm căng thẳng nhé!';
+    final todayCheckInCount = checkInProvider.getTodayCheckInCount();
 
     return SingleChildScrollView(
       child: Column(
@@ -25,9 +28,9 @@ class _StressReliefScreenState extends State<StressReliefScreen> {
           Container(
             width: double.infinity,
             clipBehavior: Clip.antiAlias,
-            decoration: const ShapeDecoration(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
+            decoration: ShapeDecoration(
+              color: isDarkMode ? const Color(0xFF1E1E2E) : Colors.white,
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(18),
                   bottomRight: Radius.circular(18),
@@ -39,16 +42,26 @@ class _StressReliefScreenState extends State<StressReliefScreen> {
                 Container(
                   width: double.infinity,
                   clipBehavior: Clip.antiAlias,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment(0.00, 0.00),
-                      end: Alignment(1.00, 1.00),
-                      colors: [
-                        Color(0xFFEEF5FE),
-                        Color(0xFFFAF5FE),
-                        Color(0xFFFCF1F7)
-                      ],
-                    ),
+                  decoration: BoxDecoration(
+                    gradient: isDarkMode
+                        ? const LinearGradient(
+                            begin: Alignment(0.00, 0.00),
+                            end: Alignment(1.00, 1.00),
+                            colors: [
+                              Color(0xFF1E1E2E),
+                              Color(0xFF2D2D3D),
+                              Color(0xFF1E1E2E)
+                            ],
+                          )
+                        : const LinearGradient(
+                            begin: Alignment(0.00, 0.00),
+                            end: Alignment(1.00, 1.00),
+                            colors: [
+                              Color(0xFFEEF5FE),
+                              Color(0xFFFAF5FE),
+                              Color(0xFFFCF1F7)
+                            ],
+                          ),
                   ),
                   child: Column(
                     children: [
@@ -119,9 +132,9 @@ class _StressReliefScreenState extends State<StressReliefScreen> {
                                             borderRadius:
                                             BorderRadius.circular(8)),
                                       ),
-                                      child: const Text(
-                                        '3 check-in hôm nay',
-                                        style: TextStyle(
+                                      child: Text(
+                                        '$todayCheckInCount check-in hôm nay',
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
                                           fontFamily: 'Arimo',

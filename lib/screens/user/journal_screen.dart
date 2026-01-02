@@ -6,6 +6,7 @@ import '../../widgets/tag_chip.dart';
 import '../../widgets/stat_card.dart';
 import '../../utils/helpers.dart';
 import '../../providers/checkin_provider.dart';
+import '../../providers/theme_provider.dart';
 
 class JournalScreen extends StatefulWidget {
   final VoidCallback? onBack;
@@ -250,22 +251,22 @@ class _JournalScreenState extends State<JournalScreen> {
           // Header Row
           Row(
             children: [
-              // Emotion Icon Container
+              // Avatar với icon cảm xúc giống màn hình check-in
               Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: emotionStyle.backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: emotionStyle.borderColor,
-                    width: 1.25,
+                width: 50,
+                height: 50,
+                decoration: ShapeDecoration(
+                  color: const Color(0xFFFAF5FF),
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(
+                      width: 1.27,
+                      color: Color(0xFFE9D4FF),
+                    ),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Icon(
-                  _getEmotionIcon(checkIn.emotion),
-                  size: 24,
-                  color: emotionStyle.color,
+                child: Center(
+                  child: _getEmotionIconWidget(checkIn.emotion),
                 ),
               ),
               const SizedBox(width: 12),
@@ -319,39 +320,42 @@ class _JournalScreenState extends State<JournalScreen> {
           if (checkIn.location != null || checkIn.activity != null || checkIn.people != null) ...[
             const SizedBox(height: 12),
             if (checkIn.location != null)
-              _buildContextRow(Icons.location_on_outlined, checkIn.location!),
+              _buildContextItem(Icons.location_on_outlined, '${_getLocationEmoji(checkIn.location!)} ${checkIn.location!}'),
             if (checkIn.activity != null)
-              _buildContextRow(Icons.local_activity_outlined, checkIn.activity!),
+              _buildContextItem(Icons.flash_on_outlined, '${_getActivityEmoji(checkIn.activity!)} ${checkIn.activity!}'),
             if (checkIn.people != null)
-              _buildContextRow(Icons.people_outline, checkIn.people!),
+              _buildContextItem(Icons.people_outline, '${_getPeopleEmoji(checkIn.people!)} ${checkIn.people!}'),
           ],
 
           // Note
           if (checkIn.note != null && checkIn.note!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 12),
+              decoration: ShapeDecoration(
                 color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '💭',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
+                  Icon(
+                    Icons.note_outlined,
+                    size: 16,
+                    color: const Color(0xFF354152),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       checkIn.note!,
                       style: const TextStyle(
+                        color: Color(0xFF354152),
                         fontSize: 14,
+                        fontFamily: 'Arimo',
                         fontWeight: FontWeight.w400,
-                        color: AppConfig.textPrimary,
                         height: 1.43,
                       ),
                     ),
@@ -365,32 +369,179 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _buildContextRow(IconData icon, String text) {
+  Widget _buildContextItem(IconData icon, String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
           Icon(
             icon,
             size: 16,
-            color: AppConfig.textSecondary,
+            color: const Color(0xFF354152),
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: AppConfig.textPrimary,
-                height: 1.43,
-              ),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Color(0xFF354152),
+              fontSize: 14,
+              fontFamily: 'Arimo',
+              fontWeight: FontWeight.w400,
+              height: 1.43,
             ),
           ),
         ],
       ),
     );
   }
+
+  // Xóa hàm _buildContextRow không dùng nữa
+  String _getLocationEmoji(String location) {
+    switch (location.toLowerCase()) {
+      case 'ở nhà':
+        return '🏠';
+      case 'công ty':
+        return '🏢';
+      case 'đang di chuyển':
+        return '🚗';
+      case 'ngoài trời':
+        return '🌳';
+      default:
+        return '📍';
+    }
+  }
+
+  String _getActivityEmoji(String activity) {
+    switch (activity.toLowerCase()) {
+      case 'họp':
+        return '📋';
+      case 'code':
+        return '💻';
+      case 'học bài':
+        return '📚';
+      case 'lướt mạng':
+        return '📱';
+      case 'ăn uống':
+        return '🍽️';
+      case 'tập thể dục':
+        return '🏃';
+      case 'thư giãn':
+        return '😌';
+      default:
+        return '⚡';
+    }
+  }
+
+  String _getPeopleEmoji(String people) {
+    switch (people.toLowerCase()) {
+      case 'một mình':
+        return '🧑';
+      case 'đồng nghiệp':
+        return '👔';
+      case 'sếp':
+        return '👨‍💼';
+      case 'gia đình':
+        return '👨‍👩‍👧';
+      case 'bạn bè':
+        return '👫';
+      case 'người yêu':
+        return '💑';
+      default:
+        return '👤';
+    }
+  }
+
+  // Lấy icon cảm xúc giống màn hình check-in
+  Widget _getEmotionIconWidget(String emotion) {
+    switch (emotion.toLowerCase()) {
+      case 'hạnh phúc':
+      case 'happy':
+        return const Icon(
+          Icons.sentiment_very_satisfied_outlined,
+          color: Colors.amber,
+          size: 28,
+        );
+      case 'vui vẻ':
+      case 'joy':
+        return const Icon(
+          Icons.sentiment_satisfied_alt_outlined,
+          color: Colors.green,
+          size: 28,
+        );
+      case 'bình thường':
+      case 'neutral':
+        return const Icon(
+          Icons.sentiment_neutral_outlined,
+          color: Colors.grey,
+          size: 28,
+        );
+      case 'buồn':
+      case 'sad':
+        return const Icon(
+          Icons.thunderstorm_outlined,
+          color: Colors.blue,
+          size: 28,
+        );
+      case 'lo lắng':
+      case 'worried':
+      case 'anxious':
+        return const Icon(
+          Icons.sentiment_dissatisfied_outlined,
+          color: Colors.purple,
+          size: 28,
+        );
+      case 'căng thẳng':
+      case 'stressed':
+        return const Icon(
+          Icons.bolt_outlined,
+          color: Colors.orange,
+          size: 28,
+        );
+      case 'giận dữ':
+      case 'angry':
+        return const Icon(
+          Icons.sentiment_very_dissatisfied,
+          color: Colors.red,
+          size: 28,
+        );
+      default:
+        return const Icon(
+          Icons.sentiment_neutral_outlined,
+          color: Colors.grey,
+          size: 28,
+        );
+    }
+  }
+
+  String _getEmotionEmoji(String emotion) {
+    switch (emotion.toLowerCase()) {
+      case 'lo lắng':
+      case 'anxious':
+      case 'worried':
+        return '😟';
+      case 'giận dữ':
+      case 'angry':
+        return '😡';
+      case 'căng thẳng':
+      case 'stressed':
+        return '😰';
+      case 'vui vẻ':
+      case 'joy':
+        return '😊';
+      case 'hạnh phúc':
+      case 'happy':
+        return '😆';
+      case 'bình thường':
+      case 'neutral':
+        return '😐';
+      case 'buồn':
+      case 'sad':
+        return '😢';
+      default:
+        return '😐';
+    }
+  }
+
 
   IconData _getEmotionIcon(String emotion) {
     switch (emotion.toLowerCase()) {
@@ -433,11 +584,23 @@ class _JournalScreenState extends State<JournalScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              // Refresh data from server
-              await context.read<CheckinProvider>().fetchCheckins();
+              final checkinProvider = context.read<CheckinProvider>();
+              final success = await checkinProvider.deleteCheckin(checkIn.id);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đã xóa check-in')),
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(
+                          success ? Icons.check_circle : Icons.error,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(success ? 'Đã xóa check-in' : 'Lỗi khi xóa check-in')),
+                      ],
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
                 );
               }
             },

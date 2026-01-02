@@ -5,35 +5,38 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final topPadding = MediaQuery.of(context).padding.top;
+
     return Container(
-      height: preferredSize.height,
+      height: preferredSize.height + topPadding,
       width: double.infinity,
-      padding: const EdgeInsets.only(top: 12, bottom: 6),
-      decoration: const BoxDecoration(
-        color: Colors.white, // 🎯 GIỐNG MÀU BOTTOM NAV
+      padding: EdgeInsets.only(top: topPadding + 12, bottom: 6),
+      decoration: BoxDecoration(
+        color: isDarkMode ? const Color(0xFF1E1E2E) : Colors.white,
         border: Border(
           bottom: BorderSide(
             width: 1,
-            color: Colors.white, // viền nhạt giống footer
+            color: isDarkMode ? const Color(0xFF2D2D3D) : Colors.white,
           ),
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           Text(
             "Tâm An",
             style: TextStyle(
-              color: Color(0xFF8B5CF6), // tím đậm
+              color: const Color(0xFF8B5CF6),
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 2),
+          const SizedBox(height: 2),
           Text(
             "Trợ lý Nhận diện Căng thẳng",
             style: TextStyle(
-              color: Color(0xFF6B7280), // xám nhạt
+              color: isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
               fontSize: 13,
             ),
           ),
