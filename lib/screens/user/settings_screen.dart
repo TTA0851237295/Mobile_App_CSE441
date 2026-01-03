@@ -860,6 +860,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+
   Widget _buildPrivacySection(bool isDarkMode) {
     return Container(
       width: double.infinity,
