@@ -1,31 +1,18 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 class AppConfig {
-  // ============ TỰ ĐỘNG PHÁT HIỆN MÔI TRƯỜNG ============
+  // ============ CẤU HÌNH IP SERVER ============
   //
-  // App sẽ TỰ ĐỘNG chọn API URL phù hợp:
-  // - Web Browser       → http://localhost:8080/api
-  // - Android Emulator  → http://10.0.2.2:8080/api
-  // - Thiết bị thật     → http://[IP máy tính]:8080/api
-  // - iOS Simulator     → http://localhost:8080/api
-  //
-  // CHỈ CẦN ĐỔI IP NÀY khi test trên điện thoại/tablet thật:
-  // Chạy 'ipconfig' trong CMD để tìm IPv4 Address
-  // ======================================================
-  
-  static const String _deviceIP = '192.168.0.101';  // IP hiện tại của máy tính
+  // Backend đã được deploy lên server public
+  // IP này hoạt động trên mọi thiết bị (web, máy thật, máy ảo)
+  // =============================================
+
+  static const String _serverIP = '52.47.197.217';  // IP Server public
+  static const String _serverPort = '8080';
 
   static String get apiBaseUrl {
-    // Web browser → dùng localhost
-    if (kIsWeb) {
-      return 'http://localhost:8080/api';
-    }
-    
-    // Mobile platforms → dùng IP của máy tính
-    // (Giả định đang test trên thiết bị thật qua WiFi)
-    // Nếu cần test emulator, đổi thành: 'http://10.0.2.2:8080/api'
-    return 'http://$_deviceIP:8080/api';
+    // Sử dụng cùng một IP server cho tất cả nền tảng
+    return 'http://$_serverIP:$_serverPort/api';
   }
 
 
