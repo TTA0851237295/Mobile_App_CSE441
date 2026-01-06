@@ -28,9 +28,22 @@ class CheckinProvider extends ChangeNotifier {
   List<CheckIn> getTodayCheckIns() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    return _checkins.where((checkin) {
-      return checkin.timestamp.isAfter(today);
+    final tomorrow = today.add(const Duration(days: 1));
+
+    print('DEBUG getTodayCheckIns: Total check-ins: ${_checkins.length}');
+    print('DEBUG getTodayCheckIns: Today start: $today');
+    print('DEBUG getTodayCheckIns: Tomorrow start: $tomorrow');
+
+    final todayCheckins = _checkins.where((checkin) {
+      // So sánh timestamp với ngày hôm nay (từ 00:00 đến 23:59:59)
+      final isToday = checkin.timestamp.isAfter(today.subtract(const Duration(seconds: 1))) &&
+                      checkin.timestamp.isBefore(tomorrow);
+      print('DEBUG getTodayCheckIns: Checkin at ${checkin.timestamp} - isToday: $isToday');
+      return isToday;
     }).toList();
+
+    print('DEBUG getTodayCheckIns: Found ${todayCheckins.length} check-ins today');
+    return todayCheckins;
   }
 
   // Get today's check-in count
@@ -93,17 +106,23 @@ class CheckinProvider extends ChangeNotifier {
       final response = await _apiService.getCheckins();
       _checkins = response.map((json) => CheckIn.fromJson(json)).toList();
       
+      print('DEBUG CHECKIN PROVIDER: Current local time: ${DateTime.now()}');
       print('DEBUG CHECKIN PROVIDER: Fetched ${_checkins.length} check-ins');
       for (var checkin in _checkins.take(5)) {
-        print('  - ${checkin.timestamp}: ${checkin.emotion}');
+        print('  - Timestamp: ${checkin.timestamp} (isUtc: ${checkin.timestamp.isUtc}) - Emotion: ${checkin.emotion}');
       }
       if (_checkins.length > 5) {
         print('  ... and ${_checkins.length - 5} more');
       }
       
+      // Debug today count
+      final todayCount = getTodayCheckInCount();
+      print('DEBUG CHECKIN PROVIDER: Today check-ins count: $todayCount');
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {
+      print('DEBUG CHECKIN PROVIDER ERROR: $e');
       _errorMessage = e.toString().replaceAll('Exception: ', '');
       _isLoading = false;
       notifyListeners();

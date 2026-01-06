@@ -7,7 +7,7 @@ class AppConfig {
   // IP này hoạt động trên mọi thiết bị (web, máy thật, máy ảo)
   // =============================================
 
-  static const String _serverIP = '52.47.197.217';  // IP Server public
+  static const String _serverIP = '47.129.206.228';  // IP Server public
   static const String _serverPort = '8080';
 
   static String get apiBaseUrl {
