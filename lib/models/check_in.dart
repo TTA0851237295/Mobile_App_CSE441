@@ -64,11 +64,59 @@ class CheckIn {
       'OTHER': 'Khác',
     };
 
+    // Parse timestamp
+    // Server backend có thể trả về:
+    // 1. UTC time với 'Z' suffix: "2025-12-01T08:00:00Z"
+    // 2. UTC time với offset: "2025-12-01T08:00:00+00:00"
+    // 3. Local time không có timezone: "2025-12-01T08:00:00" (server đã dùng timezone của nó)
+    //
+    // Đặt true nếu server trả về UTC nhưng không có 'Z', false nếu server trả về local time
+    const bool serverUsesUtcWithoutMarker = true;
+
+    DateTime parsedTime;
+    final timeString = json['createdAt'] ?? json['timestamp'];
+    if (timeString != null && timeString.toString().isNotEmpty) {
+      try {
+        final timeStr = timeString.toString();
+        parsedTime = DateTime.parse(timeStr);
+
+        print('DEBUG PARSE TIME: Raw: $timeStr, Parsed: $parsedTime, isUtc: ${parsedTime.isUtc}');
+
+        if (parsedTime.isUtc) {
+          // Đã có timezone marker (Z hoặc +00:00), convert sang local
+          parsedTime = parsedTime.toLocal();
+        } else if (serverUsesUtcWithoutMarker &&
+                   !timeStr.endsWith('Z') &&
+                   !timeStr.contains('+') &&
+                   !RegExp(r'-\d{2}:\d{2}$').hasMatch(timeStr)) {
+          // Server trả về UTC nhưng không có timezone marker
+          // Treat as UTC và convert sang local
+          parsedTime = DateTime.utc(
+            parsedTime.year,
+            parsedTime.month,
+            parsedTime.day,
+            parsedTime.hour,
+            parsedTime.minute,
+            parsedTime.second,
+            parsedTime.millisecond,
+          ).toLocal();
+        }
+        // Nếu serverUsesUtcWithoutMarker = false, giữ nguyên parsedTime (server đã gửi local time)
+
+        print('DEBUG PARSE TIME: Final local time: $parsedTime');
+      } catch (e) {
+        print('ERROR parsing timestamp: $timeString - $e');
+        parsedTime = DateTime.now();
+      }
+    } else {
+      parsedTime = DateTime.now();
+    }
+
     return CheckIn(
       id: (json['id'] ?? '').toString(),
       userId: (json['userId'] ?? '').toString(),
       emotion: vietnameseEmotion,
-      timestamp: DateTime.parse(json['createdAt'] ?? json['timestamp'] ?? DateTime.now().toIso8601String()),
+      timestamp: parsedTime,
       note: json['note'],
       tags: json['tags'] != null ? List<String>.from(json['tags']) : null,
       location: locationTag != null ? (locationMap[locationTag] ?? locationTag) : null,

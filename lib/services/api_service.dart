@@ -241,7 +241,17 @@ class ApiService {
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       final data = responseData['data'] ?? responseData; // Support both formats
-      print('DEBUG API: Checkins count: ${data.length}');
+      print('DEBUG API: Checkins count: ${data is List ? data.length : 0}');
+
+      // Log raw timestamps để debug timezone
+      if (data is List && data.isNotEmpty) {
+        print('DEBUG API: Sample raw timestamps:');
+        for (var i = 0; i < (data.length < 3 ? data.length : 3); i++) {
+          final item = data[i];
+          print('  - createdAt: ${item['createdAt']} | emotion: ${item['emotion']}');
+        }
+      }
+
       return data is List ? data : [];
     } else {
       throw Exception('Lấy danh sách check-in thất bại: ${response.body}');
